@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import os
 
 #global variables
@@ -31,3 +32,38 @@ def print_board(board):
             print("\n", end="")
 
 print(print_board(SIZE))
+=======
+def validate_format(user_input): # --> True / False
+    # Change to range(2,4) for custom board size 
+    if len(user_input) in range(2,3) and user_input[1].isdigit() and user_input[0].isalpha():
+        return True
+    else:
+        return False
+
+    
+    # second_index = int(user_move[1:])
+    # print(second_index)
+
+
+
+def get_move(board):
+    while True:
+        user_move = input("Please give your coordinates: ")
+        if validate_format(user_move):
+            row = ord(user_move[0].lower()) - 97
+            col = int(user_move[1])
+            lenght_of_board = len(board)
+            if not row <= lenght_of_board and not col <= lenght_of_board:
+                print("Invalid input")
+                continue
+            else:
+                return print(board[row][col])
+        else:
+            print("")
+
+
+
+
+get_move([[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]])                
+            
+>>>>>>> 1.2_user_input
