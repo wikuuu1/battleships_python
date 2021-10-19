@@ -14,7 +14,7 @@ def generate_board():
     return [[EMPTY_SPACE] * SIZE for _ in range(SIZE)]
 
 #prints 5x5 board without borders
-def print_board(board):
+def print_board():
     board = generate_board()
     row_letter_ascii = 97
     for i in range(SIZE):
@@ -30,7 +30,7 @@ def print_board(board):
         if i != SIZE - 1:
             print("\n", end="")
 
-print_board(SIZE)
+print_board()
 
 # def validate_format(user_input): # --> True / False
 #     # Change to range(2,4) for custom board size
