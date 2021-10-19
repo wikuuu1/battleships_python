@@ -1,10 +1,10 @@
-<<<<<<< HEAD
 import os
 
 #global variables
 SIZE = 5
 EMPTY_SPACE = "O"
 SHIP_PLACED = "X"
+
 
 # clears the screen
 def console_clear():
@@ -14,9 +14,10 @@ def console_clear():
 def generate_board():
     return [[EMPTY_SPACE] * SIZE for _ in range(SIZE)]
 
+BOARD = generate_board()
+
 #prints 5x5 board without borders
-def print_board(board):
-    board = generate_board()
+def print_board():
     row_letter_ascii = 97
     for i in range(SIZE):
         print(f"   {i + 1}", end="")
@@ -24,46 +25,71 @@ def print_board(board):
     for i in range(SIZE):
         print(f"\n{chr(row_letter_ascii + i).upper()} ", end="")
 
-        for j in range(len(board[i])):
-            print(f" {board[i][j]}", end=" ")
-            if j != len(board[i]):
+        for j in range(len(BOARD[i])):
+            print(f" {BOARD[i][j]}", end=" ")
+            if j != len(BOARD[i]):
                 print(" ", end="")
         if i != SIZE - 1:
             print("\n", end="")
+    print("\n")
 
-print(print_board(SIZE))
-=======
-def validate_format(user_input): # --> True / False
+
+# validates user's input's format
+def validate_format(user_input): 
     # Change to range(2,4) for custom board size 
     if len(user_input) in range(2,3) and user_input[1].isdigit() and user_input[0].isalpha():
         return True
     else:
         return False
-
-    
+   
     # second_index = int(user_move[1:])
     # print(second_index)
 
+# checks if ships aren't too close
+def proximity_of_ships(row, col):
+    if BOARD[row - 1][col] == SHIP_PLACED:
+        return True
+    if BOARD[row][col - 1] == SHIP_PLACED:
+        return True
+    if col + 1 < SIZE:    
+        if BOARD[row][col + 1] == SHIP_PLACED:
+            return True
+    if row + 1 < SIZE:
+        if BOARD[row + 1][col] == SHIP_PLACED:
+            return True
+    return False
 
-
-def get_move(board):
+# takes user input and checks its validity
+def get_move():
     while True:
         user_move = input("Please give your coordinates: ")
         if validate_format(user_move):
             row = ord(user_move[0].lower()) - 97
-            col = int(user_move[1])
-            lenght_of_board = len(board)
+            col = int(user_move[1]) - 1
+            lenght_of_board = len(BOARD)
             if not row <= lenght_of_board and not col <= lenght_of_board:
                 print("Invalid input")
                 continue
+            if proximity_of_ships(row, col):
+                print("Ships are too close!")
+                continue
             else:
-                return print(board[row][col])
+                return row, col
         else:
             print("")
 
+# marks user's choice of placement of the ships and returns marked board
+def mark():
+    global BOARD
+    row, col = get_move()
+    BOARD[row][col] = SHIP_PLACED
+    print_board()
 
 
+def main():
+    while True:
+        mark()                
 
-get_move([[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]])                
-            
->>>>>>> 1.2_user_input
+if __name__ == "__main__":
+    main()
+
