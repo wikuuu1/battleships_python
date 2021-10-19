@@ -33,7 +33,7 @@ where `0` indicates an empty space and `X` indicates a ship part.
 A 0 0 0 0 0
 B X X 0 0 0
 C 0 0 0 0 0
-D 0 0 0 0 0
+D 00  0 0 0
 E 0 0 0 0 0
 ```
     - If the user input is invalid (outside range), the `Invalid input!` error message is displayed and the program asks for input again.
