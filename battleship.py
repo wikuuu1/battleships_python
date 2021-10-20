@@ -16,6 +16,7 @@ def generate_board():
 
 BOARD = generate_board()
 
+
 #prints 5x5 board without borders
 def print_board():
     row_letter_ascii = 97
@@ -123,9 +124,31 @@ def mark():
         BOARD[row][col + 1] = SHIP_PLACED
     print_board()
 
+def print_two_boards(empty_board_one, empty_board_two):
+
+    print("Player 1                  Player 2\n")
+    print("   ", end="")
+    for i in range(SIZE):
+        print(str(i + 1) + "   ", end="")
+    print("      ", end="")
+    for i in range(SIZE):
+        print(str(i + 1) + "   ", end="")
+    print()
+
+    for i in range(SIZE):
+        print(chr(97 + i ).upper() + "  ", end="")
+        for j in range(SIZE):
+            print(empty_board_one[i][j] + "   " , end="")
+        print("   ", end="")
+        print(chr(97 + i).upper() + "  ", end="")
+        for j in range(SIZE):
+            print(empty_board_two[i][j] + "   " , end="")
+        print()
+        print()
 
 
 def main():
+    global BOARD
     print_board()
     global SHIPS_TO_PLACE
     while SHIPS_TO_PLACE > 0:
@@ -133,6 +156,24 @@ def main():
         SHIPS_TO_PLACE -= 1
         print(SHIPS_TO_PLACE)
 
+    player_one_board = BOARD
+    BOARD = generate_board()
+    SHIPS_TO_PLACE = 6
+    print_board()
+
+    while SHIPS_TO_PLACE > 0:
+        mark()
+        SHIPS_TO_PLACE -= 1
+        print(SHIPS_TO_PLACE)
+    player_two_board = BOARD
+
+
+    BOARD = generate_board()
+    empty_board_one  = BOARD
+    empty_board_two = BOARD
+
+    print_two_boards(empty_board_one, empty_board_two)
+
 if __name__ == "__main__":
     main()
-
+    print_two_boards()
