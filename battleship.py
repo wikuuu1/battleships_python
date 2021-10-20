@@ -47,17 +47,15 @@ def validate_format(user_input):
 
 # checks if ships aren't too close
 def proximity_of_ships(row, col):
-    if BOARD[row][col] == SHIP_PLACED:
+    if BOARD[row - 1][col] == SHIP_PLACED:
         return True
-    if BOARD[row][col] == SHIP_PLACED:
+    if BOARD[row][col - 1] == SHIP_PLACED:
         return True
     if col + 1 < SIZE:
         if BOARD[row][col + 1] == SHIP_PLACED:
-            print("col + 1")
             return True
     if row + 1 < SIZE:
         if BOARD[row + 1][col] == SHIP_PLACED:
-            print("row + 1")
             return True
     return False
 
@@ -76,6 +74,7 @@ def get_direction_for_size_two_ship(row, col, direction):
             if not proximity_of_ships(row, col + 1):
                 return row, col + 1, direction
         if direction == "left" and not col == 0:
+            print(row, col)
             if not proximity_of_ships(row, col - 1):
                 return row, col - 1, direction
         else:
@@ -96,6 +95,7 @@ def get_move():
                 print("Invalid input")
                 continue
             if proximity_of_ships(row, col):
+                print(row, col)
                 print("Ships are too close!")
                 continue
             if SHIPS_TO_PLACE > 3:
@@ -125,7 +125,6 @@ def mark():
         BOARD[row][col] = SHIP_PLACED
         BOARD[row][col + 1] = SHIP_PLACED
     print_board()
-    print(BOARD)
 
 
 
