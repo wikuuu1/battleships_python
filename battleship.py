@@ -38,7 +38,9 @@ def print_board():
 def validate_format(user_input):
     # Change to range(2,4) for custom board size
     if len(user_input) in range(2,3) and user_input[1].isdigit() and user_input[0].isalpha():
-        return True
+        if (ord(user_input[0].lower()) - 97) <= len(BOARD) - 1:
+            if int(user_input[1]) <= len(BOARD):
+                return True
     else:
         return False
 
@@ -99,7 +101,7 @@ def get_move():
             else:
                 return row, col, direction
         else:
-            print("")
+            print("Wrong coordinates format")
 
 # marks user's choice of placement of the ships and returns marked board
 def mark():
