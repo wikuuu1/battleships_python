@@ -1,4 +1,5 @@
 import os
+import time
 
 #global variables
 SIZE = 5
@@ -64,7 +65,7 @@ def ships_too_close(board, row, col):
 
 def get_direction_for_size_two_ship(row, col, direction):
     while True:
-        direction = input("Please choose direction(up/down/left/right): ")
+        direction = input("Please choose direction(up/down/left/right): ").lower()
         if direction == "up" and not row == 0:
             if not ships_too_close(BOARD, row - 1, col):
                 return row - 1, col, direction
@@ -122,6 +123,8 @@ def mark():
     if direction == "left":
         BOARD[row][col] = SHIP_PLACED
         BOARD[row][col + 1] = SHIP_PLACED
+    console_clear()
+    # print(f"\n       Player {player}\n")
     print_board()
 
 def print_two_boards(empty_board_one, empty_board_two):
@@ -149,7 +152,7 @@ def print_two_boards(empty_board_one, empty_board_two):
 def play(empty_board_one, empty_board_two, player_one_board, player_two_board):
     while True:
         print_two_boards(empty_board_one, empty_board_two)
-        user_input = input("Please give your coordinates: ")
+        user_input = input("Player 1 please give your coordinates: ")
         if validate_format(user_input):
             row = ord(user_input [0].lower()) - 97
             col = int(user_input [1]) - 1
@@ -159,26 +162,38 @@ def play(empty_board_one, empty_board_two, player_one_board, player_two_board):
                 continue
         if player_two_board[row][col] == EMPTY_SPACE:
             empty_board_two[row][col] = "M"
+            console_clear()
+            print("You've missed!")
         if player_two_board[row][col] == SHIP_PLACED:
             if ships_too_close(player_two_board, row, col):
                 empty_board_two[row][col] = "H"
                 player_two_board[row][col] = "H"
+                console_clear()
+                print("You've hit a ship!")
             else:
                 empty_board_two[row][col] = "S"
+                player_two_board[row][col] = "S"
+                console_clear()
+                print("You've sunk a ship!")
                 if empty_board_two[row - 1][col] == "H" and not row == 0:
                     empty_board_two[row - 1][col] = "S"
+                    player_two_board[row - 1][col] = "S"
                 if empty_board_two[row][col - 1] == "H" and not col == 0:
                     empty_board_two[row][col - 1] = "S"
+                    player_two_board[row][col - 1] = "S"
                 if col + 1 < SIZE:
                     if empty_board_two[row][col + 1] == "H" and not col == 4:
                         empty_board_two[row][col + 1] = "S"
+                        player_two_board[row][col + 1] = "S"
                 if row + 1 < SIZE:
                     if empty_board_two[row + 1][col] == "H" and not row == 4:
                         empty_board_two[row + 1][col] = "S"
-
+                        player_two_board[row + 1][col] = "S"
         print_two_boards(empty_board_one, empty_board_two)
-
-        user_input = input("Please give your coordinates: ")
+        if has_won(player_two_board):
+            print("Player 1 wins!")
+            quit()
+        user_input = input("Player 2 please give your coordinates: ")
         if validate_format(user_input):
             row = ord(user_input [0].lower()) - 97
             col = int(user_input [1]) - 1
@@ -186,46 +201,91 @@ def play(empty_board_one, empty_board_two, player_one_board, player_two_board):
             if not row <= lenght_of_board and not col <= lenght_of_board:
                 print("Invalid input")
                 continue
+        # if player_one_board[row][col] == "M" or player_one_board[row][col] == "S" or player_one_board[row][col] == "H":
+        #     print("You already tried this shot!")
+
         if player_one_board[row][col] == EMPTY_SPACE:
             empty_board_one[row][col] = "M"
+            console_clear()
+            print("You've missed!")
         if player_one_board[row][col] == SHIP_PLACED:
             if ships_too_close(player_one_board, row, col):
                 empty_board_one[row][col] = "H"
                 player_one_board[row][col] = "H"
+                console_clear()
+                print("You've hit a ship!")
             else:
                 empty_board_one[row][col] = "S"
+                player_one_board[row][col] = "S"
+                console_clear()
+                print("You've sunk a ship!")
                 if empty_board_one[row - 1][col] == "H" and not row == 0:
                     empty_board_one[row - 1][col] = "S"
+                    player_one_board[row - 1][col] = "S"
                 if empty_board_one[row][col - 1] == "H" and not col == 0:
                     empty_board_one[row][col - 1] = "S"
+                    player_one_board[row][col - 1] = "S"
                 if col + 1 < SIZE:
                     if empty_board_one[row][col + 1] == "H" and not col == 4:
                         empty_board_one[row][col + 1] = "S"
+                        player_one_board[row][col + 1] = "S"
                 if row + 1 < SIZE:
                     if empty_board_one[row + 1][col] == "H" and not row == 4:
                         empty_board_one[row + 1][col] = "S"
+                        player_one_board[row + 1][col] = "S"
+        if has_won(player_one_board):
+            print("Player 2 wins!")
+            quit()
 
-        print_two_boards(empty_board_one, empty_board_two)
+def waiting_screen():
+    console_clear()
+    print("Next player's placement phase")
+    time.sleep(2)
+    console_clear()
+    os.system('pause')
+    console_clear()
+
+def has_won(board):
+    count = 0
+    for i in board:
+        for j in i:
+            if j == SHIP_PLACED:
+                print(count)
+                count += 1
+    if count == 0:
+        return True
+    else:
+        return False
+
+
 
 def place_ships():
     global BOARD
     global SHIPS_TO_PLACE
+
+
     print_board()
     while SHIPS_TO_PLACE > 0:
         mark()
         SHIPS_TO_PLACE -= 1
-        print(SHIPS_TO_PLACE)
 
     player_one_board = BOARD
+    waiting_screen()
     BOARD = generate_board()
     SHIPS_TO_PLACE = 6
-    print_board()
 
+
+    print_board()
     while SHIPS_TO_PLACE > 0:
         mark()
         SHIPS_TO_PLACE -= 1
-        print(SHIPS_TO_PLACE)
     player_two_board = BOARD
+
+    console_clear()
+    print("Let the game begin!")
+    time.sleep(2)
+    os.system('pause')
+    console_clear()
 
     empty_board_one  = generate_board()
     empty_board_two = generate_board()
