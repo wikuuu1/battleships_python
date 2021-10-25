@@ -2,8 +2,8 @@ import os
 import time
 
 #global variables
-SIZE = 5
-EMPTY_SPACE = "O"
+SIZE = 10
+EMPTY_SPACE = "~"
 SHIP_PLACED = "X"
 SHIPS_TO_PLACE = 6
 
@@ -39,26 +39,31 @@ def print_board():
 # validates user's input's format
 def validate_format(user_input):
     # Change to range(2,4) for custom board size
-    if len(user_input) in range(2,3) and user_input[1].isdigit() and user_input[0].isalpha():
-        if (ord(user_input[0].lower()) - 97) <= len(BOARD) - 1:
-            if int(user_input[1]) <= len(BOARD):
-                return True
+    if SIZE < 10:
+        if len(user_input) in range(2,3) and user_input[1].isdigit() and user_input[0].isalpha():
+            if (ord(user_input[0].lower()) - 97) <= len(BOARD) - 1:
+                if int(user_input[1]) <= len(BOARD):
+                    return True
     else:
-        return False
+        if len(user_input) in range(2,4) and user_input[1].isdigit() and user_input[0].isalpha():
+            second_index = int(user_input[1:])
+            if (ord(user_input[0].lower()) - 97) <= len(BOARD) - 1:
+                if second_index <= len(BOARD):
+                    return True
+    return False
 
-    # second_index = int(user_move[1:])
 
 # checks if ships aren't too close
 def ships_too_close(board, row, col):
-    if board[row - 1][col] == SHIP_PLACED and not row == 0:
-        return True
+    # if board[row - 1][col] == SHIP_PLACED and not row == 0:
+    #     return True
     if board[row][col - 1] == SHIP_PLACED and not col == 0:
         return True
     if col + 1 < SIZE:
-        if board[row][col + 1] == SHIP_PLACED and not col == 4:
+        if board[row][col + 1] == SHIP_PLACED and not col == SIZE - 1:
             return True
     if row + 1 < SIZE:
-        if board[row + 1][col] == SHIP_PLACED and not row == 4:
+        if board[row + 1][col] == SHIP_PLACED and not row == SIZE - 1:
             return True
     return False
 
@@ -68,13 +73,13 @@ def get_direction_for_size_two_ship(row, col, direction):
     while True:
         string = "Please choose direction:"
         if not row == 0:
-            string += "\n--> (u)p "
+            string += "\n» (u)p "
         if not row == SIZE - 1:
-            string += "\n--> (d)own "
+            string += "\n» (d)own "
         if not col == 0:
-            string += "\n--> (l)eft "
+            string += "\n» (l)eft "
         if not col == SIZE - 1:
-            string += "\n--> (r)ight "
+            string += "\n» (r)ight "
         print(string)
         direction = input().lower()
         if (direction == "up" or direction == "u") and not row == 0:
@@ -100,14 +105,18 @@ def get_direction_for_size_two_ship(row, col, direction):
             continue
 
 def ask_for_coordinates():
-    counter = 0
+    # counter = 0
     while True:
         user_move = input("Please give your coordinates: ")
         if validate_format(user_move):
             row = ord(user_move[0].lower()) - 97
-            col = int(user_move[1]) - 1
-            lenght_of_board = len(BOARD)
-            if not row <= lenght_of_board and not col <= lenght_of_board:
+            if SIZE < 10:
+                col = int(user_move[1]) - 1
+            else:
+                col = int(user_move[1:]) - 1
+            print(row, col)
+            length_of_board = len(BOARD)
+            if not row <= length_of_board and not col <= length_of_board:
                 print("Invalid input")
                 continue
         else:
@@ -146,8 +155,8 @@ def mark():
         BOARD[row][col - 1] = SHIP_PLACED
     if direction == "left":
         BOARD[row][col + 1] = SHIP_PLACED
-    else:
-        BOARD[row][col] = SHIP_PLACED
+        print("left")
+    BOARD[row][col] = SHIP_PLACED
     console_clear()
     # print(f"\n       Player {player}\n")
     print_board()
@@ -205,11 +214,11 @@ def play(empty_board, player_board, player):
                     empty_board[row][col - 1] = "S"
                     player_board[row][col - 1] = "S"
                 if col + 1 < SIZE:
-                    if empty_board[row][col + 1] == "H" and not col == 4:
+                    if empty_board[row][col + 1] == "H" and not col == SIZE - 1:
                         empty_board[row][col + 1] = "S"
                         player_board[row][col + 1] = "S"
                 if row + 1 < SIZE:
-                    if empty_board[row + 1][col] == "H" and not row == 4:
+                    if empty_board[row + 1][col] == "H" and not row == SIZE - 1:
                         empty_board[row + 1][col] = "S"
                         player_board[row + 1][col] = "S"
         if has_won(player_board):
