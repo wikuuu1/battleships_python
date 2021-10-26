@@ -2,10 +2,10 @@ import os
 import time
 
 #global variables
-SIZE = 10
+SIZE = 5
 EMPTY_SPACE = "~"
 SHIP_PLACED = "X"
-SHIPS_TO_PLACE = 6
+SHIPS_TO_PLACE = 2
 
 # clears the screen
 def console_clear():
@@ -114,7 +114,7 @@ def ask_for_coordinates():
                 col = int(user_move[1]) - 1
             else:
                 col = int(user_move[1:]) - 1
-            print(row, col)
+
             length_of_board = len(BOARD)
             if not row <= length_of_board and not col <= length_of_board:
                 print("Invalid input")
@@ -135,6 +135,9 @@ def place_ship():
     while True:
         direction = None
         row, col = ask_for_coordinates()
+        if BOARD[row][col] == SHIP_PLACED:
+            print("This place is taken already!")
+            continue
         if SHIPS_TO_PLACE > 3 and not ships_too_close(BOARD, row, col):
             return get_direction_for_size_two_ship(row, col, direction)
         if ships_too_close(BOARD, row, col):
@@ -159,13 +162,13 @@ def mark():
     BOARD[row][col] = SHIP_PLACED
     console_clear()
     # print(f"\n       Player {player}\n")
-    print_board()
+    # print_board()
 
 
 # prints board for each player in shooting phase
 def print_two_boards(empty_board_one, empty_board_two):
-
-    print("Player 1                  Player 2\n")
+    spaces = (SIZE - 5) * "    "
+    print(f"Your board {spaces}               Enemy's board\n")
     print("   ", end="")
     for i in range(SIZE):
         print(str(i + 1) + "   ", end="")
@@ -178,35 +181,39 @@ def print_two_boards(empty_board_one, empty_board_two):
         print(chr(97 + i ).upper() + "  ", end="")
         for j in range(SIZE):
             print(empty_board_one[i][j] + "   " , end="")
-        print("   ", end="")
+        if SIZE < 10:
+            print("   ", end="")
+        if SIZE == 10:
+            print("    ", end="")
         print(chr(97 + i).upper() + "  ", end="")
         for j in range(SIZE):
             print(empty_board_two[i][j] + "   " , end="")
         print()
         print()
 
+
 def play(empty_board, player_board, player):
     while True:
-        print(f"Player {player + 1}")
+        print(f"Player {player + 1} turn!\n")
         row, col = ask_for_coordinates()
         if player_board[row][col] == "M" or player_board[row][col] == "S" or player_board[row][col] == "H":
-                print(f"Player {player + 1} you already tried this shot!\n")
+                print(f"\nYou have already tried this shot!\n")
                 continue
         if player_board[row][col] == EMPTY_SPACE:
             empty_board[row][col] = "M"
-            console_clear()
-            print(f"Player {player + 1} has missed!\n")
+            # console_clear()
+            print("\nYou have missed!\n")
         if player_board[row][col] == SHIP_PLACED:
             if ships_too_close(player_board, row, col):
                 empty_board[row][col] = "H"
                 player_board[row][col] = "H"
-                console_clear()
-                print(f"Player {player + 1} has hit a ship!\n")
+                # console_clear()
+                print("\nYou have hit a ship!\n")
             else:
                 empty_board[row][col] = "S"
                 player_board[row][col] = "S"
-                console_clear()
-                print(f"Player {player + 1} has sunk a ship!\n")
+                # console_clear()
+                print("\nYou have sunk a ship!\n")
                 if empty_board[row - 1][col] == "H" and not row == 0:
                     empty_board[row - 1][col] = "S"
                     player_board[row - 1][col] = "S"
@@ -226,11 +233,10 @@ def play(empty_board, player_board, player):
             quit()
         break
 
-def waiting_screen():
+def waiting_screen(message):
     console_clear()
-    print("Next player's placement phase")
+    print(message)
     time.sleep(2)
-    console_clear()
     os.system('pause')
     console_clear()
 
@@ -245,33 +251,42 @@ def has_won(board):
     else:
         return False
 
+def placement_phase(player):
+    global SHIPS_TO_PLACE
+    waiting_screen(f"Player {player + 1}, it's your turn to place the ships!\n")
 
+    print("Place your ships! (for example C4)\n")
 
-def placement_phase():
+    print_board()
+    print(f"Ships to place: {SHIPS_TO_PLACE}\n")
+    while SHIPS_TO_PLACE > 0:
+
+        mark()
+        SHIPS_TO_PLACE -= 1
+        print("Place your ships!\n")
+
+        print_board()
+        print(f"Ships to place: {SHIPS_TO_PLACE}\n")
+    return BOARD
+
+def main():
     global BOARD
     global SHIPS_TO_PLACE
 
     round = 0
     player = round % 2
 
-    print_board()
-    while SHIPS_TO_PLACE > 0:
-        mark()
-        SHIPS_TO_PLACE -= 1
-    player_one_board = BOARD
+    console_clear()
+    player_one_board = placement_phase(player)
 
-    waiting_screen()
     BOARD = generate_board()
-    SHIPS_TO_PLACE = 6
+    SHIPS_TO_PLACE = 2
+    player += 1
 
-    print_board()
-    while SHIPS_TO_PLACE > 0:
-        mark()
-        SHIPS_TO_PLACE -= 1
-    player_two_board = BOARD
+    player_two_board = placement_phase(player)
 
     console_clear()
-    print("Let the game begin!")
+    print("Let the game begin!\n")
     time.sleep(2)
     os.system('pause')
     console_clear()
@@ -282,15 +297,15 @@ def placement_phase():
     round = 0
     while True:
         player = round % 2
-        print_two_boards(empty_board_one, empty_board_two)
+        waiting_screen(f"Player {player + 1}, it's your turn to shot!\n")
         if player == 0:
+            print_two_boards(player_one_board, empty_board_two)
             play(empty_board_two, player_two_board, player)
         if player == 1:
+            print_two_boards(player_two_board, empty_board_one)
             play(empty_board_one, player_one_board, player)
         round += 1
-
-def main():
-    placement_phase()
+        os.system('pause')
 
 
 if __name__ == "__main__":
