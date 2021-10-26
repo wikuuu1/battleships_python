@@ -1,11 +1,22 @@
 import os
 import time
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 #global variables
 SIZE = 5
-EMPTY_SPACE = "~"
+EMPTY_SPACE = f"{bcolors.OKBLUE}~{bcolors.ENDC}"
 SHIP_PLACED = "X"
-SHIPS_TO_PLACE = 2
+SHIPS_TO_PLACE = 6
 
 # clears the screen
 def console_clear():
@@ -16,6 +27,7 @@ def generate_board():
     return [[EMPTY_SPACE] * SIZE for _ in range(SIZE)]
 
 BOARD = generate_board()
+
 
 
 #prints 5x5 board without borders
@@ -168,7 +180,7 @@ def mark():
 # prints board for each player in shooting phase
 def print_two_boards(empty_board_one, empty_board_two):
     spaces = (SIZE - 5) * "    "
-    print(f"Your board {spaces}               Enemy's board\n")
+    print(f"{bcolors.OKGREEN}Your board{bcolors.ENDC} {spaces}               {bcolors.FAIL}Enemy's board{bcolors.ENDC}\n")
     print("   ", end="")
     for i in range(SIZE):
         print(str(i + 1) + "   ", end="")
@@ -200,34 +212,34 @@ def play(empty_board, player_board, player):
                 print(f"\nYou have already tried this shot!\n")
                 continue
         if player_board[row][col] == EMPTY_SPACE:
-            empty_board[row][col] = "M"
+            empty_board[row][col] = f"{bcolors.FAIL}M{bcolors.ENDC}"
             # console_clear()
-            print("\nYou have missed!\n")
+            print(f"{bcolors.FAIL}\nYou have missed!\n{bcolors.ENDC}")
         if player_board[row][col] == SHIP_PLACED:
             if ships_too_close(player_board, row, col):
-                empty_board[row][col] = "H"
-                player_board[row][col] = "H"
+                empty_board[row][col] = f"{bcolors.OKGREEN}H{bcolors.ENDC}"
+                player_board[row][col] = f"{bcolors.OKGREEN}H{bcolors.ENDC}"
                 # console_clear()
-                print("\nYou have hit a ship!\n")
+                print(f"{bcolors.OKGREEN}\nYou have hit a ship!\n{bcolors.ENDC}")
             else:
-                empty_board[row][col] = "S"
-                player_board[row][col] = "S"
+                empty_board[row][col] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
+                player_board[row][col] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
                 # console_clear()
-                print("\nYou have sunk a ship!\n")
+                print(f"{bcolors.OKCYAN}\nYou have sunk a ship!\n{bcolors.ENDC}")
                 if empty_board[row - 1][col] == "H" and not row == 0:
-                    empty_board[row - 1][col] = "S"
-                    player_board[row - 1][col] = "S"
+                    empty_board[row - 1][col] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
+                    player_board[row - 1][col] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
                 if empty_board[row][col - 1] == "H" and not col == 0:
-                    empty_board[row][col - 1] = "S"
-                    player_board[row][col - 1] = "S"
+                    empty_board[row][col - 1] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
+                    player_board[row][col - 1] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
                 if col + 1 < SIZE:
                     if empty_board[row][col + 1] == "H" and not col == SIZE - 1:
-                        empty_board[row][col + 1] = "S"
-                        player_board[row][col + 1] = "S"
+                        empty_board[row][col + 1] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
+                        player_board[row][col + 1] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
                 if row + 1 < SIZE:
                     if empty_board[row + 1][col] == "H" and not row == SIZE - 1:
-                        empty_board[row + 1][col] = "S"
-                        player_board[row + 1][col] = "S"
+                        empty_board[row + 1][col] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
+                        player_board[row + 1][col] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
         if has_won(player_board):
             print(f"Player {player + 1} wins!")
             quit()
@@ -269,6 +281,14 @@ def placement_phase(player):
         print(f"Ships to place: {SHIPS_TO_PLACE}\n")
     return BOARD
 
+def menu():
+    # wybor size (uzaleznic ilosc statkow od size)
+    # limit tur
+    # ascii
+    # quit
+    # play again
+    pass
+
 def main():
     global BOARD
     global SHIPS_TO_PLACE
@@ -280,7 +300,7 @@ def main():
     player_one_board = placement_phase(player)
 
     BOARD = generate_board()
-    SHIPS_TO_PLACE = 2
+    SHIPS_TO_PLACE = 6
     player += 1
 
     player_two_board = placement_phase(player)
