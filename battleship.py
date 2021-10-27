@@ -13,7 +13,8 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 #global variables
-SIZE = 5
+SIZE = 7
+LIMIT = None
 EMPTY_SPACE = f"{bcolors.OKBLUE}~{bcolors.ENDC}"
 SHIP_PLACED = "X"
 SHIPS_TO_PLACE = 6
@@ -24,20 +25,20 @@ def console_clear():
 
 #function generates basic board
 def generate_board():
+    global SIZE
     return [[EMPTY_SPACE] * SIZE for _ in range(SIZE)]
 
 BOARD = generate_board()
 
-
-
 #prints 5x5 board without borders
 def print_board():
-    row_letter_ascii = 97
+    global SIZE
+    global BOARD
     for i in range(SIZE):
         print(f"   {i + 1}", end="")
 
     for i in range(SIZE):
-        print(f"\n{chr(row_letter_ascii + i).upper()} ", end="")
+        print(f"\n{chr(97 + i).upper()} ", end="")
 
         for j in range(len(BOARD[i])):
             print(f" {BOARD[i][j]}", end=" ")
@@ -283,19 +284,38 @@ def placement_phase(player):
     return BOARD
 
 def menu():
-    limit = None
     while True:
+        print(SIZE)
         print("1. Play battleships.")
-        print("2. Set turn limit.")
-        print("3. Set board size.")
+        print("2. Options.")
+        print("3. Credits.")
         print("4. Quit.")
         user_input = int(input())
         if user_input == 1:
             break
         if user_input == 2:
-            limit = turn_limit()
+            while True:
+                print(SIZE)
+                print("1. Set turn limit.")
+                print("2. Set board size.")
+                print("3. Back.")
+                options = int(input())
+                if options == 1:
+                    turn_limit()
+                    continue
+                if options == 2:
+                    custom_board()
+                    continue
+                if options == 3:
+                    break
+                else:
+                    print("Invalid option.")
+                    continue
         if user_input == 3:
-            pass
+            console_clear()
+            print("The Gods of the game:")
+            os.system("pause")
+            continue
         if user_input == 4:
             print("Thanks for playing. See you soon!")
             quit()
@@ -309,14 +329,29 @@ def menu():
 def welcome_screen():
     pass
 
+def custom_board():
+    global SIZE
+    global BOARD
+    while True:
+        custom_size = int(input("Choose the board size in range 5 to 10: "))
+        if custom_size in range(5, 11):
+            SIZE = custom_size
+            BOARD = generate_board()
+            print(SIZE)
+            break
+        else:
+            print("Invalid input! Must be between 5-10!")
+            continue
+
 def turn_limit():
+    global LIMIT
     while True:
         question = input("Would you like to play with turn limit?(YES/NO)").lower()
         if question == "yes" or question == "y":
             while True:
-                limit = int(input("How many rounds would you like to play(5-50)"))
-                if limit in range(5, 51):
-                    return limit
+                custom_limit = int(input("How many rounds would you like to play(5-50)"))
+                if custom_limit in range(5, 51):
+                    LIMIT = custom_limit
                 else:
                     print("Invalid input! (must be between 5-50)")
                     continue
@@ -327,7 +362,9 @@ def turn_limit():
             continue
 
 
+
 def main():
+    menu()
     global BOARD
     global SHIPS_TO_PLACE
 
