@@ -208,11 +208,12 @@ def play(empty_board, player_board, player):
     while True:
         print(f"Player {player + 1} turn!\n")
         row, col = ask_for_coordinates()
-        if player_board[row][col] == "M" or player_board[row][col] == "S" or player_board[row][col] == "H":
-                print(f"\nYou have already tried this shot!\n")
-                continue
+        if empty_board[row][col] == f"{bcolors.FAIL}M{bcolors.ENDC}" or empty_board[row][col] == f"{bcolors.OKCYAN}S{bcolors.ENDC}" or empty_board[row][col] == f"{bcolors.OKGREEN}H{bcolors.ENDC}":
+            print(f"\nYou have already tried this shot!\n")
+            continue
         if player_board[row][col] == EMPTY_SPACE:
             empty_board[row][col] = f"{bcolors.FAIL}M{bcolors.ENDC}"
+            player_board[row][col] = f"{bcolors.FAIL}M{bcolors.ENDC}"
             # console_clear()
             print(f"{bcolors.FAIL}\nYou have missed!\n{bcolors.ENDC}")
         if player_board[row][col] == SHIP_PLACED:
@@ -282,16 +283,54 @@ def placement_phase(player):
     return BOARD
 
 def menu():
+    limit = None
+    while True:
+        print("1. Play battleships.")
+        print("2. Set turn limit.")
+        print("3. Set board size.")
+        print("4. Quit.")
+        user_input = int(input())
+        if user_input == 1:
+            break
+        if user_input == 2:
+            limit = turn_limit()
+        if user_input == 3:
+            pass
+        if user_input == 4:
+            print("Thanks for playing. See you soon!")
+            quit()
+
     # wybor size (uzaleznic ilosc statkow od size)
     # limit tur
     # ascii
     # quit
     # play again
+
+def welcome_screen():
     pass
+
+def turn_limit():
+    while True:
+        question = input("Would you like to play with turn limit?(YES/NO)").lower()
+        if question == "yes" or question == "y":
+            while True:
+                limit = int(input("How many rounds would you like to play(5-50)"))
+                if limit in range(5, 51):
+                    return limit
+                else:
+                    print("Invalid input! (must be between 5-50)")
+                    continue
+        if question == "no" or question == "n":
+            return False
+        else:
+            print("Invalid input! Yes or No!")
+            continue
+
 
 def main():
     global BOARD
     global SHIPS_TO_PLACE
+
 
     round = 0
     player = round % 2
