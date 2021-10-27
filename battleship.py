@@ -13,8 +13,8 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 #global variables
-SIZE = 7
-LIMIT = None
+SIZE = 5
+LIMIT = SIZE * SIZE
 EMPTY_SPACE = f"{bcolors.OKBLUE}~{bcolors.ENDC}"
 SHIP_PLACED = "X"
 SHIPS_TO_PLACE = 6
@@ -243,8 +243,9 @@ def play(empty_board, player_board, player):
                         empty_board[row + 1][col] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
                         player_board[row + 1][col] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
         if has_won(player_board):
-            print(f"Player {player + 1} wins!")
-            quit()
+            console_clear()
+            print(f"Player {player + 1} wins!\n")
+            play_again()
         break
 
 def waiting_screen(message):
@@ -285,7 +286,7 @@ def placement_phase(player):
 
 def menu():
     while True:
-        print(SIZE)
+        console_clear()
         print("1. Play battleships.")
         print("2. Options.")
         print("3. Credits.")
@@ -295,21 +296,24 @@ def menu():
             break
         if user_input == 2:
             while True:
-                print(SIZE)
+                console_clear()
                 print("1. Set turn limit.")
                 print("2. Set board size.")
                 print("3. Back.")
                 options = int(input())
                 if options == 1:
+                    console_clear()
                     turn_limit()
                     continue
                 if options == 2:
+                    console_clear()
                     custom_board()
                     continue
                 if options == 3:
                     break
                 else:
                     print("Invalid option.")
+                    time.sleep(2)
                     continue
         if user_input == 3:
             console_clear()
@@ -317,14 +321,24 @@ def menu():
             os.system("pause")
             continue
         if user_input == 4:
+            console_clear()
             print("Thanks for playing. See you soon!")
             quit()
 
-    # wybor size (uzaleznic ilosc statkow od size)
-    # limit tur
-    # ascii
-    # quit
-    # play again
+def play_again():
+    print("Would you like to play again?")
+    print("1. Yes")
+    print("2. No")
+    while True:
+        again = int(input().strip())
+        if again == 1:
+            main()
+        if again == 2:
+            print("Farewell Dear Pirate! Arr!")
+            quit()
+        else:
+            print("Invalid input! Try again!")
+            continue
 
 def welcome_screen():
     pass
@@ -337,7 +351,6 @@ def custom_board():
         if custom_size in range(5, 11):
             SIZE = custom_size
             BOARD = generate_board()
-            print(SIZE)
             break
         else:
             print("Invalid input! Must be between 5-10!")
@@ -346,28 +359,26 @@ def custom_board():
 def turn_limit():
     global LIMIT
     while True:
-        question = input("Would you like to play with turn limit?(YES/NO)").lower()
-        if question == "yes" or question == "y":
-            while True:
-                custom_limit = int(input("How many rounds would you like to play(5-50)"))
-                if custom_limit in range(5, 51):
-                    LIMIT = custom_limit
-                else:
-                    print("Invalid input! (must be between 5-50)")
-                    continue
-        if question == "no" or question == "n":
-            return False
+        custom_limit = int(input("How many rounds would you like to play(5-50): "))
+        if custom_limit in range(5, 51):
+            LIMIT = custom_limit
+            break
         else:
-            print("Invalid input! Yes or No!")
+            print("Invalid input! (must be between 5-50)")
             continue
 
 
 
 def main():
-    menu()
     global BOARD
     global SHIPS_TO_PLACE
+    global LIMIT
+    SIZE = 5
 
+    LIMIT = SIZE * SIZE
+    SHIPS_TO_PLACE = 6
+
+    menu()
 
     round = 0
     player = round % 2
@@ -396,13 +407,28 @@ def main():
         waiting_screen(f"Player {player + 1}, it's your turn to shot!\n")
         if player == 0:
             print_two_boards(player_one_board, empty_board_two)
+            if LIMIT > 0:
+                print(f"Turns left: {LIMIT}\n")
             play(empty_board_two, player_two_board, player)
         if player == 1:
             print_two_boards(player_two_board, empty_board_one)
+            if LIMIT > 0:
+                print(f"Turns left: {LIMIT}\n")
             play(empty_board_one, player_one_board, player)
         round += 1
+        if round % 2 == 0:
+            LIMIT -= 1
         os.system('pause')
+        if LIMIT == 0:
+            console_clear()
+            print("No more turns, it's a draw.\n")
+            play_again()
 
 
 if __name__ == "__main__":
     main()
+
+#ships to place
+#ai
+#ascii
+#info for shooted player on waiting screen so the player who shooted doesnt see the info
