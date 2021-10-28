@@ -1,23 +1,39 @@
 import os
 import time
+import random
 
 class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
+# DARK COLORS
+    BLACK = '\033[30m'
+    RED = '\033[31m'
+    GREEN = '\033[32m'
+    YELLOW = '\033[33m' # BROWN
+    BLUE = '\033[34m'
+    MAGNETA = '\033[35m' # RED-ISH PURPLE
+    CYAN = '\033[36m' # TEAL (TURKUSOWY)
+    WHITE = '\033[37m' # GRAY
+# BRIGHT COLORS
+    BBLACK = '\033[90m' # DARKER GRAY
+    BRED = '\033[91m' # SALMON COLOR
+    BGREEN = '\033[92m'
+    BYELLOW = '\033[93m' # NORMAL YELLOW
+    BBLUE = '\033[94m' # BLUE-ISH PURPLE
+    BMAGNETA = '\033[95m'
+    BCYAN = '\033[96m'
+    BWHITE = '\033[97m' # WHITE
+# STYLES
+    ENDC = '\033[0m' # FINISHES COLOR CODING
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
 #global variables
 SIZE = 5
 LIMIT = SIZE * SIZE
-EMPTY_SPACE = f"{bcolors.OKBLUE}~{bcolors.ENDC}"
+EMPTY_SPACE = f"{bcolors.BLUE}~{bcolors.ENDC}"
 SHIP_PLACED = "X"
 SHIPS_TO_PLACE = 6
+INFO = ""
+AI = False
 
 # clears the screen
 def console_clear():
@@ -68,8 +84,8 @@ def validate_format(user_input):
 
 # checks if ships aren't too close
 def ships_too_close(board, row, col):
-    # if board[row - 1][col] == SHIP_PLACED and not row == 0:
-    #     return True
+    if board[row - 1][col] == SHIP_PLACED and not row == 0:
+        return True
     if board[row][col - 1] == SHIP_PLACED and not col == 0:
         return True
     if col + 1 < SIZE:
@@ -113,8 +129,7 @@ def get_direction_for_size_two_ship(row, col, direction):
                 console_clear()
                 counter = 0
                 print_board()
-            print("Incorrect direction. Try again!")
-
+            print("\nIncorrect direction. Try again!\n")
             continue
 
 def ask_for_coordinates():
@@ -130,7 +145,7 @@ def ask_for_coordinates():
 
             length_of_board = len(BOARD)
             if not row <= length_of_board and not col <= length_of_board:
-                print("Invalid input")
+                print("\nInvalid input\n")
                 continue
         else:
             # counter += 1
@@ -138,7 +153,7 @@ def ask_for_coordinates():
             #     console_clear()
             #     counter = 0
             #     print_board()
-            print("Wrong coordinates format")
+            print("\nWrong coordinates format\n")
             continue
 
         return row, col
@@ -147,7 +162,7 @@ def ask_for_coordinates():
 def place_ship():
     while True:
         direction = None
-        row, col = ask_for_coordinates()
+        row, col, direction = ai_place_ship()   # zmiana row, col = ask_for_coordinates()
         if BOARD[row][col] == SHIP_PLACED:
             print("This place is taken already!")
             continue
@@ -174,14 +189,12 @@ def mark():
         print("left")
     BOARD[row][col] = SHIP_PLACED
     console_clear()
-    # print(f"\n       Player {player}\n")
-    # print_board()
 
 
 # prints board for each player in shooting phase
 def print_two_boards(empty_board_one, empty_board_two):
     spaces = (SIZE - 5) * "    "
-    print(f"{bcolors.OKGREEN}Your board{bcolors.ENDC} {spaces}               {bcolors.FAIL}Enemy's board{bcolors.ENDC}\n")
+    print(f"{bcolors.GREEN}Your board{bcolors.ENDC} {spaces}               {bcolors.RED}Enemy's board{bcolors.ENDC}\n")
     print("   ", end="")
     for i in range(SIZE):
         print(str(i + 1) + "   ", end="")
@@ -206,42 +219,48 @@ def print_two_boards(empty_board_one, empty_board_two):
 
 
 def play(empty_board, player_board, player):
+    global INFO
     while True:
         print(f"Player {player + 1} turn!\n")
-        row, col = ask_for_coordinates()
-        if empty_board[row][col] == f"{bcolors.FAIL}M{bcolors.ENDC}" or empty_board[row][col] == f"{bcolors.OKCYAN}S{bcolors.ENDC}" or empty_board[row][col] == f"{bcolors.OKGREEN}H{bcolors.ENDC}":
+        if player == 0:
+            row, col = ask_for_coordinates()
+        if player == 1 and AI == True:
+            row, col = AI_move(empty_board)
+        if player == 1 and AI == False:
+            row, col = ask_for_coordinates()
+        if empty_board[row][col] == f"{bcolors.RED}M{bcolors.ENDC}" or empty_board[row][col] == f"{bcolors.CYAN}S{bcolors.ENDC}" or empty_board[row][col] == f"{bcolors.GREEN}H{bcolors.ENDC}":
             print(f"\nYou have already tried this shot!\n")
             continue
         if player_board[row][col] == EMPTY_SPACE:
-            empty_board[row][col] = f"{bcolors.FAIL}M{bcolors.ENDC}"
-            player_board[row][col] = f"{bcolors.FAIL}M{bcolors.ENDC}"
-            # console_clear()
-            print(f"{bcolors.FAIL}\nYou have missed!\n{bcolors.ENDC}")
+            empty_board[row][col] = f"{bcolors.RED}M{bcolors.ENDC}"
+            player_board[row][col] = f"{bcolors.RED}M{bcolors.ENDC}"
+            INFO = f"{bcolors.RED}\nPlayer {player + 1} has missed! ({str(chr(row + 65)) + str((col + 1))})\n{bcolors.ENDC}"
+            print(f"{bcolors.RED}\nYou have missed!\n{bcolors.ENDC}")
         if player_board[row][col] == SHIP_PLACED:
             if ships_too_close(player_board, row, col):
-                empty_board[row][col] = f"{bcolors.OKGREEN}H{bcolors.ENDC}"
-                player_board[row][col] = f"{bcolors.OKGREEN}H{bcolors.ENDC}"
-                # console_clear()
-                print(f"{bcolors.OKGREEN}\nYou have hit a ship!\n{bcolors.ENDC}")
+                empty_board[row][col] = f"{bcolors.GREEN}H{bcolors.ENDC}"
+                player_board[row][col] = f"{bcolors.GREEN}H{bcolors.ENDC}"
+                INFO = (f"{bcolors.GREEN}\nPlayer {player + 1} has hit a ship! ({str(chr(row + 65)) + str((col + 1))})\n{bcolors.ENDC}")
+                print((f"{bcolors.GREEN}\nYou have hit a ship!\n{bcolors.ENDC}"))
             else:
-                empty_board[row][col] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
-                player_board[row][col] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
-                # console_clear()
-                print(f"{bcolors.OKCYAN}\nYou have sunk a ship!\n{bcolors.ENDC}")
-                if empty_board[row - 1][col] == "H" and not row == 0:
-                    empty_board[row - 1][col] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
-                    player_board[row - 1][col] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
-                if empty_board[row][col - 1] == "H" and not col == 0:
-                    empty_board[row][col - 1] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
-                    player_board[row][col - 1] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
+                empty_board[row][col] = f"{bcolors.CYAN}S{bcolors.ENDC}"
+                player_board[row][col] = f"{bcolors.CYAN}S{bcolors.ENDC}"
+                INFO = (f"{bcolors.CYAN}\nPlayer {player + 1} has sunk a ship! ({str(chr(row + 65)) + str((col + 1))})\n{bcolors.ENDC}")
+                print((f"{bcolors.CYAN}\nYou have sunk a ship!\n{bcolors.ENDC}"))
+                if empty_board[row - 1][col] == f"{bcolors.GREEN}H{bcolors.ENDC}" and not row == 0:
+                    empty_board[row - 1][col] = f"{bcolors.CYAN}S{bcolors.ENDC}"
+                    player_board[row - 1][col] = f"{bcolors.CYAN}S{bcolors.ENDC}"
+                if empty_board[row][col - 1] == f"{bcolors.GREEN}H{bcolors.ENDC}" and not col == 0:
+                    empty_board[row][col - 1] = f"{bcolors.CYAN}S{bcolors.ENDC}"
+                    player_board[row][col - 1] = f"{bcolors.CYAN}S{bcolors.ENDC}"
                 if col + 1 < SIZE:
-                    if empty_board[row][col + 1] == "H" and not col == SIZE - 1:
-                        empty_board[row][col + 1] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
-                        player_board[row][col + 1] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
+                    if empty_board[row][col + 1] == f"{bcolors.GREEN}H{bcolors.ENDC}" and not col == SIZE - 1:
+                        empty_board[row][col + 1] = f"{bcolors.CYAN}S{bcolors.ENDC}"
+                        player_board[row][col + 1] = f"{bcolors.CYAN}S{bcolors.ENDC}"
                 if row + 1 < SIZE:
-                    if empty_board[row + 1][col] == "H" and not row == SIZE - 1:
-                        empty_board[row + 1][col] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
-                        player_board[row + 1][col] = f"{bcolors.OKCYAN}S{bcolors.ENDC}"
+                    if empty_board[row + 1][col] == f"{bcolors.GREEN}H{bcolors.ENDC}" and not row == SIZE - 1:
+                        empty_board[row + 1][col] = f"{bcolors.CYAN}S{bcolors.ENDC}"
+                        player_board[row + 1][col] = f"{bcolors.CYAN}S{bcolors.ENDC}"
         if has_won(player_board):
             console_clear()
             print(f"Player {player + 1} wins!\n")
@@ -284,60 +303,121 @@ def placement_phase(player):
         print(f"Ships to place: {SHIPS_TO_PLACE}\n")
     return BOARD
 
-def menu():
+
+def sunk_ships_close(row, col, board):
+    if board[row - 1][col] == f"{bcolors.CYAN}S{bcolors.ENDC}" and not row == 0:
+        return True
+    if board[row][col - 1] == f"{bcolors.CYAN}S{bcolors.ENDC}" and not col == 0:
+        return True
+    if col + 1 < SIZE:
+        if board[row][col + 1] == f"{bcolors.CYAN}S{bcolors.ENDC}" and not col == SIZE - 1:
+            return True
+    if row + 1 < SIZE:
+        if board[row + 1][col] == f"{bcolors.CYAN}S{bcolors.ENDC}" and not row == SIZE - 1:
+            return True
+    return False
+
+def AI_move(empty_board): # zmiana
     while True:
-        console_clear()
-        print("1. Play battleships.")
-        print("2. Options.")
-        print("3. Credits.")
-        print("4. Quit.")
-        user_input = int(input())
-        if user_input == 1:
-            break
-        if user_input == 2:
-            while True:
-                console_clear()
-                print("1. Set turn limit.")
-                print("2. Set board size.")
-                print("3. Back.")
-                options = int(input())
-                if options == 1:
-                    console_clear()
-                    turn_limit()
-                    continue
-                if options == 2:
-                    console_clear()
-                    custom_board()
-                    continue
-                if options == 3:
-                    break
-                else:
-                    print("Invalid option.")
-                    time.sleep(2)
-                    continue
-        if user_input == 3:
-            console_clear()
-            print("The Gods of the game:")
-            os.system("pause")
-            continue
-        if user_input == 4:
-            console_clear()
-            print("Thanks for playing. See you soon!")
-            quit()
+            for index1, row in enumerate(empty_board):
+                for index2, i in enumerate(row):
+                    if i == f"{bcolors.GREEN}H{bcolors.ENDC}":
+                        row, col = index1, index2
+                        if empty_board[row - 1][col] == EMPTY_SPACE and not row == 0:
+                            return row - 1, col
+                        if empty_board[row][col - 1] == EMPTY_SPACE and not col == 0:
+                            return row, col - 1
+                        if col + 1 < SIZE:
+                            if empty_board[row][col + 1] == EMPTY_SPACE and not col == SIZE - 1:
+                                return row, col + 1
+                        if row + 1 < SIZE:
+                            if empty_board[row + 1][col] == EMPTY_SPACE and not row == SIZE - 1:
+                                return row + 1, col
+
+            potencial_row = []
+            for index, row in enumerate(empty_board):
+                if row.count(EMPTY_SPACE):
+                    potencial_row.append(index)
+            # print(potencial_row)
+            first_index = random.choice(potencial_row)
+            # print(first_index)
+
+            potencial_move = []
+            for index, row in enumerate(empty_board[first_index]):
+                if row == EMPTY_SPACE:
+                    potencial_move.append(index)
+            # print(potencial_move)
+            second_index = random.choice(potencial_move)
+            # print(second_index)
+            if empty_board[first_index][second_index] and sunk_ships_close(first_index, second_index, empty_board):
+                continue
+            else:
+                return first_index, second_index
+
+def ai_place_ship(): # zmiana
+    while True:
+        if SHIPS_TO_PLACE > 3:
+            potencial_place = []
+            for index, row in enumerate(BOARD):
+                if row.count(EMPTY_SPACE) > 1:
+                    potencial_place.append(index)
+
+            first_index = random.choice(potencial_place)
+
+            potencial_move = []
+            for index, row in enumerate(BOARD[first_index]):
+                if row == EMPTY_SPACE:
+                    potencial_move.append(index)
+
+            second_index = random.choice(potencial_move)
+            directions = ["up", "down", "right", "left"]
+            direct = random.choices(directions)
+            print(first_index, second_index, direct)
+            if "up" in direct and not ships_too_close(BOARD, first_index, second_index) and not ships_too_close(BOARD, first_index - 1, second_index):
+                return first_index, second_index, direct
+            if "down" in direct and not ships_too_close(BOARD, first_index, second_index) and not ships_too_close(BOARD, first_index + 1, second_index):
+                return first_index, second_index, direct
+            if "right" in direct and not ships_too_close(BOARD, first_index, second_index) and not ships_too_close(BOARD, first_index, second_index + 1):
+                return first_index, second_index, direct
+            if "left" in direct and not ships_too_close(BOARD, first_index, second_index) and not ships_too_close(BOARD, first_index, second_index - 1):
+                return first_index, second_index, direct
+            else:
+                continue
+        else:
+            potencial_place = []
+            for index, row in enumerate(BOARD):
+                if row.count(EMPTY_SPACE) > 1:
+                    potencial_place.append(index)
+
+            first_index = random.choice(potencial_place)
+
+            potencial_move = []
+            for index, row in enumerate(BOARD[first_index]):
+                if row == EMPTY_SPACE:
+                    potencial_move.append(index)
+
+            second_index = random.choice(potencial_move)
+            if ships_too_close(BOARD, first_index, second_index):
+                continue
 
 def play_again():
-    print("Would you like to play again?")
-    print("1. Yes")
-    print("2. No")
+    print("""Would you like to play again?"
+
+    1. Yes
+
+    2. No
+    """)
     while True:
-        again = int(input().strip())
-        if again == 1:
+        again = input().strip()
+        if again == "":
+            continue
+        if again == "1":
             main()
-        if again == 2:
-            print("Farewell Dear Pirate! Arr!")
+        if again == "2":
+            print("\nFarewell Dear Pirate! Arr!\n")
             quit()
         else:
-            print("Invalid input! Try again!")
+            print("\nInvalid input! Try again!\n")
             continue
 
 def welcome_screen():
@@ -347,24 +427,30 @@ def custom_board():
     global SIZE
     global BOARD
     while True:
-        custom_size = int(input("Choose the board size in range 5 to 10: "))
-        if custom_size in range(5, 11):
-            SIZE = custom_size
+        custom_size = input("Choose the board size in range 5-10: ").strip()
+        if custom_size == "":
+            print("\nInvalid input! Must be between 5-10!\n")
+            continue
+        if int(custom_size) in range(5, 11):
+            SIZE = int(custom_size)
             BOARD = generate_board()
             break
         else:
-            print("Invalid input! Must be between 5-10!")
+            print("\nInvalid input! Must be between 5-10!\n")
             continue
 
 def turn_limit():
     global LIMIT
     while True:
-        custom_limit = int(input("How many rounds would you like to play(5-50): "))
-        if custom_limit in range(5, 51):
-            LIMIT = custom_limit
+        custom_limit = input("Choose the number of rounds between 5-50: ").strip()
+        if custom_limit == "":
+            print("\nInvalid input! Must be between 5-50!\n")
+            continue
+        if int(custom_limit) in range(5, 51):
+            LIMIT = int(custom_limit)
             break
         else:
-            print("Invalid input! (must be between 5-50)")
+            print("\nInvalid input! Must be between 5-50!\n")
             continue
 
 
@@ -378,7 +464,7 @@ def main():
     LIMIT = SIZE * SIZE
     SHIPS_TO_PLACE = 6
 
-    menu()
+
 
     round = 0
     player = round % 2
@@ -404,7 +490,7 @@ def main():
     round = 0
     while True:
         player = round % 2
-        waiting_screen(f"Player {player + 1}, it's your turn to shot!\n")
+        waiting_screen(f"{INFO}\nPlayer {player + 1}, it's your turn to shot!\n")
         if player == 0:
             print_two_boards(player_one_board, empty_board_two)
             if LIMIT > 0:
@@ -424,11 +510,89 @@ def main():
             print("No more turns, it's a draw.\n")
             play_again()
 
+def menu():
+    global AI
+    global BOARD
+    while True:
+        console_clear()
+        print("""MAIN MENU
+
+    1. Play battleships
+
+    2. Options
+
+    3. Credits
+
+    4. Quit
+    """)
+        user_input = input().strip()
+        if user_input == "":
+            continue
+        if user_input == "1":
+            while True:
+                console_clear()
+                print("""MENU
+
+        1. Play against a friend
+
+        2. Play against the computer
+        """)
+                user_choice = input().strip()
+                if user_choice == "1":
+                    main()
+                if user_choice == "2":
+                    AI = True
+                    main()
+                else:
+                    print("\nInvalid option.\n")
+                    time.sleep(2)
+                    continue
+        if user_input == "2":
+            while True:
+                console_clear()
+                print("""MENU
+
+    1. Set turn limit
+
+    2. Set board size
+
+    3. Return to main menu
+    """)
+                options = input().strip()
+                if options == "":
+                    continue
+                if options == "1":
+                    console_clear()
+                    turn_limit()
+                    continue
+                if options == "2":
+                    console_clear()
+                    custom_board()
+                    continue
+                if options == "3":
+                    menu()
+                else:
+                    print("\nInvalid option.\n")
+                    time.sleep(2)
+                    continue
+        if user_input == "3":
+            console_clear()
+            print("The Gods of the game:")
+            os.system("pause")
+            continue
+        if user_input == "4":
+            console_clear()
+            print("\nThanks for playing. See you soon!\n")
+            quit()
+        else:
+            print("\nInvalid option.\n")
+            time.sleep(2)
+            continue
 
 if __name__ == "__main__":
-    main()
+    menu()
+
 
 #ships to place
 #ai
 #ascii
-#info for shooted player on waiting screen so the player who shooted doesnt see the info
