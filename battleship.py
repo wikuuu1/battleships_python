@@ -427,14 +427,15 @@ def custom_board():
     global SIZE
     global BOARD
     while True:
-        custom_size = input("Choose the board size in range 5-10: ").strip()
-        if custom_size == "":
-            print("\nInvalid input! Must be between 5-10!\n")
+        try:
+            custom_size = input("Choose the board size in range 5-10: ").strip()
+            if int(custom_size) in range(5, 11):
+                SIZE = int(custom_size)
+                BOARD = generate_board()
+                break
+        except ValueError:
+            print("\nNot a number! Try again.\n")
             continue
-        if int(custom_size) in range(5, 11):
-            SIZE = int(custom_size)
-            BOARD = generate_board()
-            break
         else:
             print("\nInvalid input! Must be between 5-10!\n")
             continue
@@ -442,13 +443,14 @@ def custom_board():
 def turn_limit():
     global LIMIT
     while True:
-        custom_limit = input("Choose the number of rounds between 5-50: ").strip()
-        if custom_limit == "":
-            print("\nInvalid input! Must be between 5-50!\n")
+        try:
+            custom_limit = input("Choose the number of rounds between 5-50: ").strip()
+            if int(custom_limit) in range(5, 51):
+                LIMIT = int(custom_limit)
+                break
+        except ValueError:
+            print("\nNot a number! Try again.\n")
             continue
-        if int(custom_limit) in range(5, 51):
-            LIMIT = int(custom_limit)
-            break
         else:
             print("\nInvalid input! Must be between 5-50!\n")
             continue
@@ -656,4 +658,3 @@ if __name__ == "__main__":
 
 #ships to place
 #ai
-#ascii
