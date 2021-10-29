@@ -2,6 +2,7 @@ import os
 import time
 import random
 
+# terminal colors
 class bcolors:
 # DARK COLORS
     BLACK = '\033[30m'
@@ -132,8 +133,8 @@ def get_direction_for_size_two_ship(row, col, direction):
             print("\nIncorrect direction. Try again!\n")
             continue
 
+#asking user for coordinates
 def ask_for_coordinates():
-    # counter = 0
     while True:
         user_move = input("Please give your coordinates: ")
         if validate_format(user_move):
@@ -148,11 +149,6 @@ def ask_for_coordinates():
                 print("\nInvalid input\n")
                 continue
         else:
-            # counter += 1
-            # if counter == 5:
-            #     console_clear()
-            #     counter = 0
-            #     print_board()
             print("\nWrong coordinates format\n")
             continue
 
@@ -162,7 +158,7 @@ def ask_for_coordinates():
 def place_ship():
     while True:
         direction = None
-        row, col = ask_for_coordinates()   # zmiana row, col = ask_for_coordinates()
+        row, col = ask_for_coordinates()
         if BOARD[row][col] == SHIP_PLACED:
             print("This place is taken already!")
             continue
@@ -189,6 +185,7 @@ def mark():
     BOARD[row][col] = SHIP_PLACED
     console_clear()
 
+#marks computer ships on board
 def mark_ai():
     global BOARD
     row, col = ai_place_ship()
@@ -196,9 +193,14 @@ def mark_ai():
     console_clear()
 
 # prints board for each player in shooting phase
-def print_two_boards(empty_board_one, empty_board_two):
+def print_two_boards(empty_board_one, empty_board_two, player):
     spaces = (SIZE - 5) * "    "
-    print(f"{bcolors.GREEN}Your board{bcolors.ENDC} {spaces}               {bcolors.RED}Enemy's board{bcolors.ENDC}\n")
+    second_board = ""
+    if AI == True and player == 1:
+        second_board += "Computer shooting board"
+    else:
+        second_board += "Enemy's board"
+    print(f"{bcolors.GREEN}Your board{bcolors.ENDC} {spaces}               {bcolors.RED}{second_board}{bcolors.ENDC}\n")
     print("   ", end="")
     for i in range(SIZE):
         print(str(i + 1) + "   ", end="")
@@ -221,7 +223,7 @@ def print_two_boards(empty_board_one, empty_board_two):
         print()
         print()
 
-
+#getting coordinates from computer/player and printing message confirming their shot
 def play(empty_board, player_board, player):
     global INFO
     while True:
@@ -229,6 +231,8 @@ def play(empty_board, player_board, player):
         if player == 0:
             row, col = ask_for_coordinates()
         if player == 1 and AI == True:
+            print("I'm thinking...")
+            time.sleep(2)
             row, col = AI_move(empty_board)
         if player == 1 and AI == False:
             row, col = ask_for_coordinates()
@@ -271,6 +275,7 @@ def play(empty_board, player_board, player):
             play_again()
         break
 
+#waiting screen - waits for pressing any key and printing a message
 def waiting_screen(message):
     console_clear()
     print(message)
@@ -278,6 +283,7 @@ def waiting_screen(message):
     os.system('pause')
     console_clear()
 
+# checks if the player has won
 def has_won(board):
     count = 0
     for i in board:
@@ -289,6 +295,7 @@ def has_won(board):
     else:
         return False
 
+#printing and marking the board
 def placement_phase(player):
     global SHIPS_TO_PLACE
     waiting_screen(f"Player {player + 1}, it's your turn to place the ships!\n")
@@ -300,16 +307,19 @@ def placement_phase(player):
     while SHIPS_TO_PLACE > 0:
         if AI == True and player == 1:
             mark_ai()
+            SHIPS_TO_PLACE -= 1
+            print("Computer's building ships...")
+            time.sleep(1)
         if player == 0 or (player == 1 and AI == False):
             mark()
-        SHIPS_TO_PLACE -= 1
-        print("Place your ships!\n")
+            print_board()
+            SHIPS_TO_PLACE -= 1
+            print("Place your ships!\n")
+            print(f"Ships to place: {SHIPS_TO_PLACE}\n")
 
-        print_board()
-        print(f"Ships to place: {SHIPS_TO_PLACE}\n")
     return BOARD
 
-
+#checks strategy for the computer
 def sunk_ships_close(row, col, board):
     if board[row - 1][col] == f"{bcolors.CYAN}S{bcolors.ENDC}" and not row == 0:
         return True
@@ -323,7 +333,8 @@ def sunk_ships_close(row, col, board):
             return True
     return False
 
-def AI_move(empty_board): # zmiana
+#returns coordinates for the computer shooting phase
+def AI_move(empty_board):
     while True:
             for index1, row in enumerate(empty_board):
                 for index2, i in enumerate(row):
@@ -344,23 +355,24 @@ def AI_move(empty_board): # zmiana
             for index, row in enumerate(empty_board):
                 if row.count(EMPTY_SPACE):
                     potencial_row.append(index)
-            # print(potencial_row)
+
             first_index = random.choice(potencial_row)
-            # print(first_index)
+
 
             potencial_move = []
             for index, row in enumerate(empty_board[first_index]):
                 if row == EMPTY_SPACE:
                     potencial_move.append(index)
-            # print(potencial_move)
+
             second_index = random.choice(potencial_move)
-            # print(second_index)
+
             if empty_board[first_index][second_index] and sunk_ships_close(first_index, second_index, empty_board):
                 continue
             else:
                 return first_index, second_index
 
-def ai_place_ship(): # zmiana
+#returns coordinates for the computer placement phase
+def ai_place_ship():
     while True:
         if SHIPS_TO_PLACE > 3:
             potencial_place = []
@@ -378,7 +390,7 @@ def ai_place_ship(): # zmiana
             second_index = random.choice(potencial_move)
             directions = ["up", "down", "right", "left"]
             direct = random.choices(directions)
-            print(first_index, second_index, direct)
+
             if "up" in direct and not first_index == 0 and not ships_too_close(BOARD, first_index, second_index) and not ships_too_close(BOARD, first_index - 1, second_index):
                 BOARD[first_index - 1][second_index] = SHIP_PLACED
                 return first_index, second_index
@@ -411,6 +423,8 @@ def ai_place_ship(): # zmiana
                 continue
             # direct = None
             return first_index, second_index
+
+#asks if you want to play again
 def play_again():
     print("""Would you like to play again?"
 
@@ -431,9 +445,16 @@ def play_again():
             print("\nInvalid input! Try again!\n")
             continue
 
+#prints game name
 def welcome_screen():
-    pass
+    print("""
+______  _______ _______ _______        _______ _______ _     _ _____  _____  _______
+|_____] |_____|    |       |    |      |______ |______ |_____|   |   |_____] |______
+|_____] |     |    |       |    |_____ |______ ______| |     | __|__ |       ______|
 
+""")
+
+#changes board size
 def custom_board():
     global SIZE
     global BOARD
@@ -451,6 +472,7 @@ def custom_board():
             print("\nInvalid input! Must be between 5-10!\n")
             continue
 
+#sets turn limit
 def turn_limit():
     global LIMIT
     while True:
@@ -467,7 +489,7 @@ def turn_limit():
             continue
 
 
-
+#main game algorithm
 def main():
     global BOARD
     global SHIPS_TO_PLACE
@@ -505,12 +527,15 @@ def main():
         player = round % 2
         waiting_screen(f"{INFO}\nPlayer {player + 1}, it's your turn to shot!\n")
         if player == 0:
-            print_two_boards(player_one_board, empty_board_two)
+            print_two_boards(player_one_board, empty_board_two, player)
             if LIMIT > 0:
                 print(f"Turns left: {LIMIT}\n")
             play(empty_board_two, player_two_board, player)
         if player == 1:
-            print_two_boards(player_two_board, empty_board_one)
+            if AI == False:
+                print_two_boards(player_two_board, empty_board_one, player)
+            if AI == True:
+                print_two_boards(player_one_board, empty_board_one, player)
             if LIMIT > 0:
                 print(f"Turns left: {LIMIT}\n")
             play(empty_board_one, player_one_board, player)
@@ -523,11 +548,13 @@ def main():
             print("No more turns, it's a draw.\n")
             play_again()
 
+#main menu game
 def menu():
     global AI
     global BOARD
     while True:
         console_clear()
+        welcome_screen()
         print("""MAIN MENU
 
     1. Play battleships
@@ -544,11 +571,14 @@ def menu():
         if user_input == "1":
             while True:
                 console_clear()
+                welcome_screen()
                 print("""MENU
 
-        1. Play against a friend
+    1. Player vs Player
 
-        2. Play against the computer
+    2. Player vs Computer
+
+    3. Back
         """)
                 user_choice = input().strip()
                 if user_choice == "1":
@@ -556,6 +586,8 @@ def menu():
                 if user_choice == "2":
                     AI = True
                     main()
+                if user_choice == "3":
+                    menu()
                 else:
                     print("\nInvalid option.\n")
                     time.sleep(2)
@@ -563,13 +595,14 @@ def menu():
         if user_input == "2":
             while True:
                 console_clear()
+                welcome_screen()
                 print("""MENU
 
     1. Set turn limit
 
     2. Set board size
 
-    3. Return to main menu
+    3. Back
     """)
                 options = input().strip()
                 if options == "":
@@ -602,6 +635,7 @@ def menu():
             time.sleep(2)
             continue
 
+#authors
 def credits():
     left_movement = 50
     names = 'Sebastian '
