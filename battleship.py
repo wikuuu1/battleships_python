@@ -162,7 +162,7 @@ def ask_for_coordinates():
 def place_ship():
     while True:
         direction = None
-        row, col, direction = ai_place_ship()   # zmiana row, col = ask_for_coordinates()
+        row, col = ask_for_coordinates()   # zmiana row, col = ask_for_coordinates()
         if BOARD[row][col] == SHIP_PLACED:
             print("This place is taken already!")
             continue
@@ -186,10 +186,14 @@ def mark():
         BOARD[row][col - 1] = SHIP_PLACED
     if direction == "left":
         BOARD[row][col + 1] = SHIP_PLACED
-        print("left")
     BOARD[row][col] = SHIP_PLACED
     console_clear()
 
+def mark_ai():
+    global BOARD
+    row, col = ai_place_ship()
+    BOARD[row][col] = SHIP_PLACED
+    console_clear()
 
 # prints board for each player in shooting phase
 def print_two_boards(empty_board_one, empty_board_two):
@@ -294,8 +298,10 @@ def placement_phase(player):
     print_board()
     print(f"Ships to place: {SHIPS_TO_PLACE}\n")
     while SHIPS_TO_PLACE > 0:
-
-        mark()
+        if AI == True and player == 1:
+            mark_ai()
+        if player == 0 or (player == 1 and AI == False):
+            mark()
         SHIPS_TO_PLACE -= 1
         print("Place your ships!\n")
 
@@ -373,14 +379,18 @@ def ai_place_ship(): # zmiana
             directions = ["up", "down", "right", "left"]
             direct = random.choices(directions)
             print(first_index, second_index, direct)
-            if "up" in direct and not ships_too_close(BOARD, first_index, second_index) and not ships_too_close(BOARD, first_index - 1, second_index):
-                return first_index, second_index, direct
-            if "down" in direct and not ships_too_close(BOARD, first_index, second_index) and not ships_too_close(BOARD, first_index + 1, second_index):
-                return first_index, second_index, direct
-            if "right" in direct and not ships_too_close(BOARD, first_index, second_index) and not ships_too_close(BOARD, first_index, second_index + 1):
-                return first_index, second_index, direct
-            if "left" in direct and not ships_too_close(BOARD, first_index, second_index) and not ships_too_close(BOARD, first_index, second_index - 1):
-                return first_index, second_index, direct
+            if "up" in direct and not first_index == 0 and not ships_too_close(BOARD, first_index, second_index) and not ships_too_close(BOARD, first_index - 1, second_index):
+                BOARD[first_index - 1][second_index] = SHIP_PLACED
+                return first_index, second_index
+            if "down" in direct and not first_index == SIZE - 1 and not ships_too_close(BOARD, first_index, second_index) and not ships_too_close(BOARD, first_index + 1, second_index):
+                BOARD[first_index + 1][second_index] = SHIP_PLACED
+                return first_index, second_index
+            if "right" in direct and not second_index == SIZE - 1 and not ships_too_close(BOARD, first_index, second_index) and not ships_too_close(BOARD, first_index, second_index + 1):
+                BOARD[first_index][second_index + 1] = SHIP_PLACED
+                return first_index, second_index
+            if "left" in direct and not second_index == 0 and not ships_too_close(BOARD, first_index, second_index) and not ships_too_close(BOARD, first_index, second_index - 1):
+                BOARD[first_index][second_index - 1] = SHIP_PLACED
+                return first_index, second_index
             else:
                 continue
         else:
@@ -399,7 +409,8 @@ def ai_place_ship(): # zmiana
             second_index = random.choice(potencial_move)
             if ships_too_close(BOARD, first_index, second_index):
                 continue
-
+            # direct = None
+            return first_index, second_index
 def play_again():
     print("""Would you like to play again?"
 
