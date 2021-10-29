@@ -577,7 +577,7 @@ def menu():
                     continue
         if user_input == "3":
             console_clear()
-            print("The Gods of the game:")
+            credits()
             os.system("pause")
             continue
         if user_input == "4":
@@ -588,6 +588,67 @@ def menu():
             print("\nInvalid option.\n")
             time.sleep(2)
             continue
+
+def credits():
+    left_movement = 50
+    names = 'Sebastian '
+    def clear():
+        os.system('cls' if os.name == 'nt' else 'clear')
+    clear()
+
+    for i in range(50):
+        movement = '  ' * left_movement
+
+        if i % 3 == 0:
+            upanddown =[" ", "", "  ", "   "]
+            stars = random.choice(upanddown)
+        if i % 4 == 0:
+            space = random.choice(upanddown)
+        if i == 5:
+            names += 'Chomentowski, '
+        if i == 10:
+            names += 'Oktawia '
+        if i == 15:
+            names += 'Czuczwara, '
+        if i == 20:
+            names += 'Wiktoria '
+        if i == 24:
+            names += 'Rajba, '
+        if i == 29:
+            names += 'Wiktoria '
+        if i == 34:
+            names += 'Śladowska '
+
+        waves = f"""{bcolors.WHITE}   ~~~~~~     {space}           ~~~~~~~~               ~~            {stars}    ~~~ ~~~          ~~~~~~             {bcolors.BBLACK}     ~~~~~~~  {space}   ~~~~~~~        ~~
+            ~~~ ~~~          ~~~~~~                 {bcolors.BBLACK} ~~~~~~~  {bcolors.WHITE} {stars}  ~~~~~~~             ~~~ ~~~          ~~~~~~                {space}  ~~~~~~~                 {bcolors.BBLACK} ~~~~~~~
+        {space}~~~    {bcolors.WHITE}            ~~~~            ~  ~~~       ~~~~                 ~~~ {bcolors.BBLACK}~~~~ {stars}    ~~~        {bcolors.WHITE}        ~~~~   ~~~~~~  ~  ~~~       ~~~~                 ~~~ ~~~~
+        ~~~~~    {stars}  ~~~      ~     ~~~~~~~~~     {bcolors.BBLACK}  ~~~            {bcolors.WHITE}  ~~~~~~~~~~    ~~~~~      ~~~      ~     ~~~~~~~~~       ~~~              ~~~~~~~~~~{bcolors.ENDC}"""
+        credits = f"""
+  *      ,-,              {stars}    *            *                                     *                      {space}         *               *    {stars}        *                       *
+        /.(                                             {space}    *                                                                      *             {stars}   *         *
+        \ (         *        {stars}           *         *                          *           {stars}            *                                                          *
+     *   `-`              {space}       *                                     *                 *                    *       {stars}                     *               *      {space}         *
+{movement}   {bcolors.RED}               |{bcolors.BBLACK}
+{movement}                  |
+{movement}           |    {bcolors.WHITE}__-__
+{movement}         __-__ /  | (
+{movement}        /  | ((   | |
+{movement}      /(   | ||___|_.  .|
+{movement}    .' |___|_|`---|-'.' (
+{movement}{bcolors.BBLACK}'-._{bcolors.WHITE}/_| (   |\     |.'    \\
+{movement}     '-._|.-.|-.    |'-.____'.{bcolors.BBLACK}
+{movement}      |------------------'
+{movement}       `----------------'                           {bcolors.MAGNETA}{names}
+{waves}"""
+        print(credits)
+        time.sleep(0.5)
+        clear()
+        left_movement -= 1
+        if i == 49:
+            print(credits + '\n')
+            time.sleep(5)
+            # os.system("pause")
+
 
 if __name__ == "__main__":
     menu()
