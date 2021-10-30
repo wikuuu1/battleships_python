@@ -27,7 +27,7 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-#global variables
+#global variables #fixme
 SIZE = 5
 LIMIT = SIZE * SIZE
 EMPTY_SPACE = f"{bcolors.BLUE}~{bcolors.ENDC}"
@@ -42,7 +42,6 @@ def console_clear():
 
 #function generates basic board
 def generate_board():
-    global SIZE
     return [[EMPTY_SPACE] * SIZE for _ in range(SIZE)]
 
 BOARD = generate_board()
@@ -59,7 +58,7 @@ def print_board():
 
         for j in range(len(BOARD[i])):
             print(f" {BOARD[i][j]}", end=" ")
-            if j != len(BOARD[i]):
+            if j != len(BOARD[i]) - 1:
                 print(" ", end="")
         if i != SIZE - 1:
             print("\n", end="")
@@ -112,6 +111,7 @@ def get_direction_for_size_two_ship(row, col, direction):
             string += "\n» (r)ight "
         print(string)
         direction = input().lower()
+
         if (direction == "up" or direction == "u") and not row == 0:
             if not ships_too_close(BOARD, row - 1, col):
                 return row - 1, col, "up"
@@ -223,6 +223,7 @@ def print_two_boards(empty_board_one, empty_board_two, player):
         print()
         print()
 
+# M = f"{bcolors.RED}M{bcolors.ENDC}" fixme
 #getting coordinates from computer/player and printing message confirming their shot
 def play(empty_board, player_board, player):
     global INFO
@@ -276,6 +277,7 @@ def play(empty_board, player_board, player):
         break
 
 #waiting screen - waits for pressing any key and printing a message
+# show_waiting_screen()
 def waiting_screen(message):
     console_clear()
     print(message)
@@ -284,6 +286,7 @@ def waiting_screen(message):
     console_clear()
 
 # checks if the player has won
+#fixme
 def has_won(board):
     count = 0
     for i in board:
@@ -494,9 +497,7 @@ def main():
     global BOARD
     global SHIPS_TO_PLACE
     global LIMIT
-    SIZE = 5
 
-    LIMIT = SIZE * SIZE
     SHIPS_TO_PLACE = 6
 
 
@@ -637,11 +638,10 @@ def menu():
 
 #authors
 def credits():
+    """show animation"""
     left_movement = 50
     names = 'Sebastian '
-    def clear():
-        os.system('cls' if os.name == 'nt' else 'clear')
-    clear()
+    console_clear()
 
     for i in range(50):
         movement = '  ' * left_movement
@@ -689,7 +689,7 @@ def credits():
 {waves}"""
         print(credits)
         time.sleep(0.5)
-        clear()
+        console_clear()
         left_movement -= 1
         if i == 49:
             print(credits + '\n')
@@ -701,5 +701,4 @@ if __name__ == "__main__":
     menu()
 
 
-#ships to place
-#ai
+
