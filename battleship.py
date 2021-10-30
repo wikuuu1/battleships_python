@@ -289,17 +289,57 @@ def play(my_board, empty_board, player_board, player):
                 if empty_board[row - 1][col] == f"{bcolors.GREEN}H{bcolors.ENDC}" and not row == 0:
                     empty_board[row - 1][col] = f"{bcolors.CYAN}S{bcolors.ENDC}"
                     player_board[row - 1][col] = f"{bcolors.CYAN}S{bcolors.ENDC}"
+                    if AI == False or player == 0:
+                        console_clear()
+                        print_two_boards(my_board, empty_board, player)
+                        if LIMIT > 0:
+                            print(f"Turns left: {LIMIT}\n")
+                    if AI == True and player == 1:
+                        console_clear()
+                        print_two_boards(player_board, empty_board, player)
+                        if LIMIT > 0:
+                            print(f"Turns left: {LIMIT}\n")
                 if empty_board[row][col - 1] == f"{bcolors.GREEN}H{bcolors.ENDC}" and not col == 0:
                     empty_board[row][col - 1] = f"{bcolors.CYAN}S{bcolors.ENDC}"
                     player_board[row][col - 1] = f"{bcolors.CYAN}S{bcolors.ENDC}"
+                    if AI == False or player == 0:
+                        console_clear()
+                        print_two_boards(my_board, empty_board, player)
+                        if LIMIT > 0:
+                            print(f"Turns left: {LIMIT}\n")
+                    if AI == True and player == 1:
+                        console_clear()
+                        print_two_boards(player_board, empty_board, player)
+                        if LIMIT > 0:
+                            print(f"Turns left: {LIMIT}\n")
                 if col + 1 < SIZE:
                     if empty_board[row][col + 1] == f"{bcolors.GREEN}H{bcolors.ENDC}" and not col == SIZE - 1:
                         empty_board[row][col + 1] = f"{bcolors.CYAN}S{bcolors.ENDC}"
                         player_board[row][col + 1] = f"{bcolors.CYAN}S{bcolors.ENDC}"
+                        if AI == False or player == 0:
+                            console_clear()
+                            print_two_boards(my_board, empty_board, player)
+                            if LIMIT > 0:
+                                print(f"Turns left: {LIMIT}\n")
+                        if AI == True and player == 1:
+                            console_clear()
+                            print_two_boards(player_board, empty_board, player)
+                            if LIMIT > 0:
+                                print(f"Turns left: {LIMIT}\n")
                 if row + 1 < SIZE:
                     if empty_board[row + 1][col] == f"{bcolors.GREEN}H{bcolors.ENDC}" and not row == SIZE - 1:
                         empty_board[row + 1][col] = f"{bcolors.CYAN}S{bcolors.ENDC}"
                         player_board[row + 1][col] = f"{bcolors.CYAN}S{bcolors.ENDC}"
+                        if AI == False or player == 0:
+                            console_clear()
+                            print_two_boards(my_board, empty_board, player)
+                            if LIMIT > 0:
+                                print(f"Turns left: {LIMIT}\n")
+                        if AI == True and player == 1:
+                            console_clear()
+                            print_two_boards(player_board, empty_board, player)
+                            if LIMIT > 0:
+                                print(f"Turns left: {LIMIT}\n")
         if has_won(player_board):
             console_clear()
             print(f"Player {player + 1} wins!\n")
