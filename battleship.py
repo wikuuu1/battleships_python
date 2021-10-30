@@ -27,7 +27,7 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-#global variables
+#global variables #fixme
 SIZE = 5
 LIMIT = SIZE * SIZE
 EMPTY_SPACE = f"{bcolors.BLUE}~{bcolors.ENDC}"
@@ -42,7 +42,6 @@ def console_clear():
 
 #function generates basic board
 def generate_board():
-    global SIZE
     return [[EMPTY_SPACE] * SIZE for _ in range(SIZE)]
 
 BOARD = generate_board()
@@ -59,7 +58,7 @@ def print_board():
 
         for j in range(len(BOARD[i])):
             print(f" {BOARD[i][j]}", end=" ")
-            if j != len(BOARD[i]):
+            if j != len(BOARD[i]) - 1:
                 print(" ", end="")
         if i != SIZE - 1:
             print("\n", end="")
@@ -112,6 +111,7 @@ def get_direction_for_size_two_ship(row, col, direction):
             string += "\n» (r)ight "
         print(string)
         direction = input().lower()
+
         if (direction == "up" or direction == "u") and not row == 0:
             if not ships_too_close(BOARD, row - 1, col):
                 return row - 1, col, "up"
@@ -223,8 +223,9 @@ def print_two_boards(empty_board_one, empty_board_two, player):
         print()
         print()
 
+# M = f"{bcolors.RED}M{bcolors.ENDC}" fixme
 #getting coordinates from computer/player and printing message confirming their shot
-def play(empty_board, player_board, player):
+def play(my_board, empty_board, player_board, player):
     global INFO
     while True:
         print(f"Player {player + 1} turn!\n")
@@ -242,33 +243,103 @@ def play(empty_board, player_board, player):
         if player_board[row][col] == EMPTY_SPACE:
             empty_board[row][col] = f"{bcolors.RED}M{bcolors.ENDC}"
             player_board[row][col] = f"{bcolors.RED}M{bcolors.ENDC}"
+            if AI == False or player == 0:
+                    console_clear()
+                    print_two_boards(my_board, empty_board, player)
+                    if LIMIT > 0:
+                        print(f"Turns left: {LIMIT}\n")
+            if AI == True and player == 1:
+                console_clear()
+                print_two_boards(player_board, empty_board, player)
+                if LIMIT > 0:
+                    print(f"Turns left: {LIMIT}\n")
             INFO = f"{bcolors.RED}\nPlayer {player + 1} has missed! ({str(chr(row + 65)) + str((col + 1))})\n{bcolors.ENDC}"
             print(f"{bcolors.RED}\nYou have missed!\n{bcolors.ENDC}")
         if player_board[row][col] == SHIP_PLACED:
             if ships_too_close(player_board, row, col):
                 empty_board[row][col] = f"{bcolors.GREEN}H{bcolors.ENDC}"
                 player_board[row][col] = f"{bcolors.GREEN}H{bcolors.ENDC}"
+                if AI == False or player == 0:
+                    console_clear()
+                    print_two_boards(my_board, empty_board, player)
+                    if LIMIT > 0:
+                        print(f"Turns left: {LIMIT}\n")
+                if AI == True and player == 1:
+                    console_clear()
+                    print_two_boards(player_board, empty_board, player)
+                    if LIMIT > 0:
+                        print(f"Turns left: {LIMIT}\n")
                 INFO = (f"{bcolors.GREEN}\nPlayer {player + 1} has hit a ship! ({str(chr(row + 65)) + str((col + 1))})\n{bcolors.ENDC}")
                 print((f"{bcolors.GREEN}\nYou have hit a ship!\n{bcolors.ENDC}"))
             else:
                 empty_board[row][col] = f"{bcolors.CYAN}S{bcolors.ENDC}"
                 player_board[row][col] = f"{bcolors.CYAN}S{bcolors.ENDC}"
+                if AI == False or player == 0:
+                    console_clear()
+                    print_two_boards(my_board, empty_board, player)
+                    if LIMIT > 0:
+                        print(f"Turns left: {LIMIT}\n")
+                if AI == True and player == 1:
+                    console_clear()
+                    print_two_boards(player_board, empty_board, player)
+                    if LIMIT > 0:
+                        print(f"Turns left: {LIMIT}\n")
                 INFO = (f"{bcolors.CYAN}\nPlayer {player + 1} has sunk a ship! ({str(chr(row + 65)) + str((col + 1))})\n{bcolors.ENDC}")
                 print((f"{bcolors.CYAN}\nYou have sunk a ship!\n{bcolors.ENDC}"))
                 if empty_board[row - 1][col] == f"{bcolors.GREEN}H{bcolors.ENDC}" and not row == 0:
                     empty_board[row - 1][col] = f"{bcolors.CYAN}S{bcolors.ENDC}"
                     player_board[row - 1][col] = f"{bcolors.CYAN}S{bcolors.ENDC}"
+                    if AI == False or player == 0:
+                        console_clear()
+                        print_two_boards(my_board, empty_board, player)
+                        if LIMIT > 0:
+                            print(f"Turns left: {LIMIT}\n")
+                    if AI == True and player == 1:
+                        console_clear()
+                        print_two_boards(player_board, empty_board, player)
+                        if LIMIT > 0:
+                            print(f"Turns left: {LIMIT}\n")
                 if empty_board[row][col - 1] == f"{bcolors.GREEN}H{bcolors.ENDC}" and not col == 0:
                     empty_board[row][col - 1] = f"{bcolors.CYAN}S{bcolors.ENDC}"
                     player_board[row][col - 1] = f"{bcolors.CYAN}S{bcolors.ENDC}"
+                    if AI == False or player == 0:
+                        console_clear()
+                        print_two_boards(my_board, empty_board, player)
+                        if LIMIT > 0:
+                            print(f"Turns left: {LIMIT}\n")
+                    if AI == True and player == 1:
+                        console_clear()
+                        print_two_boards(player_board, empty_board, player)
+                        if LIMIT > 0:
+                            print(f"Turns left: {LIMIT}\n")
                 if col + 1 < SIZE:
                     if empty_board[row][col + 1] == f"{bcolors.GREEN}H{bcolors.ENDC}" and not col == SIZE - 1:
                         empty_board[row][col + 1] = f"{bcolors.CYAN}S{bcolors.ENDC}"
                         player_board[row][col + 1] = f"{bcolors.CYAN}S{bcolors.ENDC}"
+                        if AI == False or player == 0:
+                            console_clear()
+                            print_two_boards(my_board, empty_board, player)
+                            if LIMIT > 0:
+                                print(f"Turns left: {LIMIT}\n")
+                        if AI == True and player == 1:
+                            console_clear()
+                            print_two_boards(player_board, empty_board, player)
+                            if LIMIT > 0:
+                                print(f"Turns left: {LIMIT}\n")
                 if row + 1 < SIZE:
                     if empty_board[row + 1][col] == f"{bcolors.GREEN}H{bcolors.ENDC}" and not row == SIZE - 1:
                         empty_board[row + 1][col] = f"{bcolors.CYAN}S{bcolors.ENDC}"
                         player_board[row + 1][col] = f"{bcolors.CYAN}S{bcolors.ENDC}"
+                        if AI == False or player == 0:
+                            console_clear()
+                            print_two_boards(my_board, empty_board, player)
+                            if LIMIT > 0:
+                                print(f"Turns left: {LIMIT}\n")
+                        if AI == True and player == 1:
+                            console_clear()
+                            print_two_boards(player_board, empty_board, player)
+                            if LIMIT > 0:
+                                print(f"Turns left: {LIMIT}\n")
         if has_won(player_board):
             console_clear()
             print(f"Player {player + 1} wins!\n")
@@ -276,6 +347,7 @@ def play(empty_board, player_board, player):
         break
 
 #waiting screen - waits for pressing any key and printing a message
+# show_waiting_screen()
 def waiting_screen(message):
     console_clear()
     print(message)
@@ -284,6 +356,7 @@ def waiting_screen(message):
     console_clear()
 
 # checks if the player has won
+#fixme
 def has_won(board):
     count = 0
     for i in board:
@@ -494,9 +567,7 @@ def main():
     global BOARD
     global SHIPS_TO_PLACE
     global LIMIT
-    SIZE = 5
 
-    LIMIT = SIZE * SIZE
     SHIPS_TO_PLACE = 6
 
 
@@ -530,7 +601,7 @@ def main():
             print_two_boards(player_one_board, empty_board_two, player)
             if LIMIT > 0:
                 print(f"Turns left: {LIMIT}\n")
-            play(empty_board_two, player_two_board, player)
+            play(player_one_board, empty_board_two, player_two_board, player)
         if player == 1:
             if AI == False:
                 print_two_boards(player_two_board, empty_board_one, player)
@@ -538,7 +609,7 @@ def main():
                 print_two_boards(player_one_board, empty_board_one, player)
             if LIMIT > 0:
                 print(f"Turns left: {LIMIT}\n")
-            play(empty_board_one, player_one_board, player)
+            play(player_two_board, empty_board_one, player_one_board, player)
         round += 1
         if round % 2 == 0:
             LIMIT -= 1
@@ -637,11 +708,10 @@ def menu():
 
 #authors
 def credits():
+    """show animation"""
     left_movement = 50
     names = 'Sebastian '
-    def clear():
-        os.system('cls' if os.name == 'nt' else 'clear')
-    clear()
+    console_clear()
 
     for i in range(50):
         movement = '  ' * left_movement
@@ -689,7 +759,7 @@ def credits():
 {waves}"""
         print(credits)
         time.sleep(0.5)
-        clear()
+        console_clear()
         left_movement -= 1
         if i == 49:
             print(credits + '\n')
@@ -701,5 +771,4 @@ if __name__ == "__main__":
     menu()
 
 
-#ships to place
-#ai
+
