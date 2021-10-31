@@ -101,7 +101,7 @@ def ships_too_close(board, row, col):
 def get_direction_for_size_two_ship(row, col, direction):
     counter = 0
     while True:
-        string = "Please choose direction:"
+        string = "\nPlease choose direction:"
         if not row == 0:
             string += "\n» (u)p "
         if not row == SIZE - 1:
@@ -130,7 +130,7 @@ def get_direction_for_size_two_ship(row, col, direction):
                 console_clear()
                 counter = 0
                 print_board()
-            print("\nIncorrect direction. Try again!\n")
+            print("\n█ Incorrect direction. Try again!\n")
             continue
 
 #asking user for coordinates
@@ -146,10 +146,10 @@ def ask_for_coordinates():
 
             length_of_board = len(BOARD)
             if not row <= length_of_board and not col <= length_of_board:
-                print("\nInvalid input\n")
+                print("\n█ Invalid input\n")
                 continue
         else:
-            print("\nWrong coordinates format\n")
+            print("\n█ Wrong coordinates format\n")
             continue
 
         return row, col
@@ -160,12 +160,12 @@ def place_ship():
         direction = None
         row, col = ask_for_coordinates()
         if BOARD[row][col] == SHIP_PLACED:
-            print("This place is taken already!")
+            print("\n█ This place is taken already!\n")
             continue
         if SHIPS_TO_PLACE > 3 and not ships_too_close(BOARD, row, col):
             return get_direction_for_size_two_ship(row, col, direction)
         if ships_too_close(BOARD, row, col):
-            print("Ships are too close!")
+            print("\n█ Ships are too close!\n")
             continue
         else:
             return row, col, direction
@@ -227,34 +227,45 @@ def print_two_boards(empty_board_one, empty_board_two, player):
 def play(empty_board, player_board, player):
     global INFO
     while True:
-        print(f"Player {player + 1} turn!\n")
         if player == 0:
+            print(f"{bcolors.BMAGNETA}Player {player + 1}{bcolors.ENDC} turn!\n")
             row, col = ask_for_coordinates()
         if player == 1 and AI == True:
-            print("I'm thinking...")
+            print(f"{bcolors.RED}Computer{bcolors.ENDC}'s turn!\n")
+            print("█ I'm thinking...")    #fixme blink
             time.sleep(2)
             row, col = AI_move(empty_board)
         if player == 1 and AI == False:
+            print(f"{bcolors.BMAGNETA}Player {player + 1}{bcolors.ENDC} turn!\n")
             row, col = ask_for_coordinates()
         if empty_board[row][col] == f"{bcolors.RED}M{bcolors.ENDC}" or empty_board[row][col] == f"{bcolors.CYAN}S{bcolors.ENDC}" or empty_board[row][col] == f"{bcolors.GREEN}H{bcolors.ENDC}":
-            print(f"\nYou have already tried this shot!\n")
+            print(f"\n█ You have already tried this shot!\n")
             continue
         if player_board[row][col] == EMPTY_SPACE:
             empty_board[row][col] = f"{bcolors.RED}M{bcolors.ENDC}"
             player_board[row][col] = f"{bcolors.RED}M{bcolors.ENDC}"
-            INFO = f"{bcolors.RED}\nPlayer {player + 1} has missed! ({str(chr(row + 65)) + str((col + 1))})\n{bcolors.ENDC}"
-            print(f"{bcolors.RED}\nYou have missed!\n{bcolors.ENDC}")
+            INFO = f"{bcolors.RED}\nPlayer {player + 1} has missed! ({str(chr(row + 65)) + str((col + 1))})\n{bcolors.ENDC}\n"
+            if player == 0 or player == 1 and AI == False:
+                print(f"{bcolors.RED}\nYou have missed!\n{bcolors.ENDC}")
+            if AI == True and player == 1:
+                print(f"{bcolors.RED}\nComputer has missed!\n{bcolors.ENDC}")
         if player_board[row][col] == SHIP_PLACED:
             if ships_too_close(player_board, row, col):
                 empty_board[row][col] = f"{bcolors.GREEN}H{bcolors.ENDC}"
                 player_board[row][col] = f"{bcolors.GREEN}H{bcolors.ENDC}"
-                INFO = (f"{bcolors.GREEN}\nPlayer {player + 1} has hit a ship! ({str(chr(row + 65)) + str((col + 1))})\n{bcolors.ENDC}")
-                print((f"{bcolors.GREEN}\nYou have hit a ship!\n{bcolors.ENDC}"))
+                INFO = (f"{bcolors.GREEN}\nPlayer {player + 1} has hit a ship! ({str(chr(row + 65)) + str((col + 1))})\n{bcolors.ENDC}\n")
+                if player == 0 or player == 1 and AI == False:
+                    print((f"{bcolors.GREEN}\nYou have hit a ship!\n{bcolors.ENDC}"))
+                if AI == True and player == 1:
+                    print((f"{bcolors.GREEN}\nComputer has hit a ship!\n{bcolors.ENDC}"))
             else:
                 empty_board[row][col] = f"{bcolors.CYAN}S{bcolors.ENDC}"
                 player_board[row][col] = f"{bcolors.CYAN}S{bcolors.ENDC}"
-                INFO = (f"{bcolors.CYAN}\nPlayer {player + 1} has sunk a ship! ({str(chr(row + 65)) + str((col + 1))})\n{bcolors.ENDC}")
-                print((f"{bcolors.CYAN}\nYou have sunk a ship!\n{bcolors.ENDC}"))
+                INFO = (f"{bcolors.CYAN}\nPlayer {player + 1} has sunk a ship! ({str(chr(row + 65)) + str((col + 1))})\n{bcolors.ENDC}\n")
+                if player == 0 or player == 1 and AI == False:
+                    print((f"{bcolors.CYAN}\nYou have sunk a ship!\n{bcolors.ENDC}"))
+                if AI == True and player == 1:
+                    print((f"{bcolors.CYAN}\nComputer has sunk a ship!\n{bcolors.ENDC}"))
                 if empty_board[row - 1][col] == f"{bcolors.GREEN}H{bcolors.ENDC}" and not row == 0:
                     empty_board[row - 1][col] = f"{bcolors.CYAN}S{bcolors.ENDC}"
                     player_board[row - 1][col] = f"{bcolors.CYAN}S{bcolors.ENDC}"
@@ -271,7 +282,7 @@ def play(empty_board, player_board, player):
                         player_board[row + 1][col] = f"{bcolors.CYAN}S{bcolors.ENDC}"
         if has_won(player_board):
             console_clear()
-            print(f"Player {player + 1} wins!\n")
+            print(f"█ Player {player + 1} wins!\n")
             play_again()
         break
 
@@ -298,7 +309,10 @@ def has_won(board):
 #printing and marking the board
 def placement_phase(player):
     global SHIPS_TO_PLACE
-    waiting_screen(f"Player {player + 1}, it's your turn to place the ships!\n")
+    if (player == 0 or player == 1) and AI == False:
+        waiting_screen(f"{bcolors.BMAGNETA}Player {player + 1}{bcolors.ENDC}, it's your turn to place the ships!\n")
+    if player == 1 and AI == True:
+        waiting_screen(f"It's {bcolors.RED}Computer{bcolors.ENDC}'s turn to place the ships!\n")
 
     print("Place your ships! (for example C4)\n")
 
@@ -308,14 +322,14 @@ def placement_phase(player):
         if AI == True and player == 1:
             mark_ai()
             SHIPS_TO_PLACE -= 1
-            print("Computer's building ships...")
+            print("█ Computer's building ships...\n")
             time.sleep(1)
         if player == 0 or (player == 1 and AI == False):
             mark()
             print_board()
             SHIPS_TO_PLACE -= 1
-            print("Place your ships!\n")
-            print(f"Ships to place: {SHIPS_TO_PLACE}\n")
+            print("Place your ships! (for example 'C4')\n")
+            print(f"█ Ships to place: {SHIPS_TO_PLACE}\n")
 
     return BOARD
 
@@ -458,6 +472,7 @@ ______  _______ _______ _______        _______ _______ _     _ _____  _____  ___
 def custom_board():
     global SIZE
     global BOARD
+    welcome_screen()
     while True:
         try:
             custom_size = input("Choose the board size in range 5-10: ").strip()
@@ -475,6 +490,7 @@ def custom_board():
 #sets turn limit
 def turn_limit():
     global LIMIT
+    welcome_screen()
     while True:
         try:
             custom_limit = input("Choose the number of rounds between 5-50: ").strip()
@@ -525,16 +541,19 @@ def main():
     round = 0
     while True:
         player = round % 2
-        waiting_screen(f"{INFO}\nPlayer {player + 1}, it's your turn to shot!\n")
+        # waiting_screen(f"{bcolors.BMAGNETA}Player {player + 1}{bcolors.ENDC}, it's your turn to shot!\n")
         if player == 0:
+            waiting_screen(f"{bcolors.BMAGNETA}Player {player + 1}{bcolors.ENDC}, it's your turn to shoot!\n")
             print_two_boards(player_one_board, empty_board_two, player)
             if LIMIT > 0:
                 print(f"Turns left: {LIMIT}\n")
             play(empty_board_two, player_two_board, player)
         if player == 1:
             if AI == False:
+                waiting_screen(f"{bcolors.BMAGNETA}Player {player + 1}{bcolors.ENDC}, it's your turn to shoot!\n")
                 print_two_boards(player_two_board, empty_board_one, player)
             if AI == True:
+                waiting_screen(f"It's {bcolors.RED}Computer{bcolors.ENDC} turn to shoot!\n")
                 print_two_boards(player_one_board, empty_board_one, player)
             if LIMIT > 0:
                 print(f"Turns left: {LIMIT}\n")
