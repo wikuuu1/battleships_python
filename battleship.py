@@ -619,7 +619,7 @@ def main():
             print_two_boards(player_one_board, empty_board_two, player)
             if LIMIT > 0:
                 print(f"Turns left: {LIMIT}\n")
-            play(empty_board_two, player_two_board, player)
+            play(player_one_board, empty_board_two, player_two_board, player)
         if player == 1:
             if AI == False:
                 waiting_screen(f"{bcolors.BMAGNETA}Player {player + 1}{bcolors.ENDC}, it's your turn to shoot!\n")
